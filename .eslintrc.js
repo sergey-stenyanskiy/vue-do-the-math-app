@@ -31,6 +31,7 @@ module.exports = {
     "no-plusplus": "off",
     "max-len": "off",
     "object-curly-newline": "off",
-    "no-param-reassign": "off"
+    "no-param-reassign": "off",
+    "vue/multi-word-component-names": "off"
   },
 };
