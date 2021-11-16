@@ -70,13 +70,14 @@ export default defineComponent({
         difficulty: this.difficulty,
         operators: [...this.operators]
       });
+
+      this.$router.push({ name: 'Game' });
     }
   }
 })
 </script>
 
 <style lang="scss" scoped>
-
 .operator {
   display: flex;
   flex-direction: row;
