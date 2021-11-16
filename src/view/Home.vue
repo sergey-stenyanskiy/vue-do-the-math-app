@@ -1,12 +1,19 @@
 <template lang="pug">
-| Settings screen
+SettingsForm
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
 
+import { GameSettings } from '@/types/types';
+
+import SettingsForm from '../component/SettingsForm.vue'
+
 export default defineComponent({
   name: 'Home',
+  components: {
+    SettingsForm
+  },
   beforeRouteLeave(
     from,
     to,
@@ -15,6 +22,11 @@ export default defineComponent({
     this.$store.dispatch('setPreviousRoute', this.$route.fullPath);
 
     next();
+  },
+  computed: {
+    settings(): GameSettings {
+      return this.$store.state.settings;
+    }
   }
 })
 </script>
