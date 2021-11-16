@@ -68,8 +68,14 @@ export default defineComponent({
 
   display: flex;
   flex-direction: row;
+  justify-content: center;
   align-items: center;
+
+  cursor: pointer;
+  box-shadow: 0 2px 4px 2px rgba(0,0,0,0.4);
 }
+
+
 
 .round-button-red {
   background: #F9734D;
