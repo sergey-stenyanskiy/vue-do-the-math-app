@@ -72,10 +72,12 @@ export default defineComponent({
   align-items: center;
 
   cursor: pointer;
-  box-shadow: 0 2px 4px 2px rgba(0,0,0,0.4);
+  transition: box-shadow, 0.1s ease-in;
 }
 
-
+.round-button:focus {
+  box-shadow: 0 2px 4px 2px rgba(0,0,0,0.2);
+}
 
 .round-button-red {
   background: #F9734D;
