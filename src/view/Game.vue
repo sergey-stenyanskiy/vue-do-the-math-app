@@ -14,18 +14,17 @@
       span(v-else) {{term.term}}
     span.question-mark ?
   .controls
-    .digits
-      .digit(v-for="digit in digits")
-        RoundButton(@click="handleDigitClick(digit)" size="45px")
-          template(v-slot:child) {{digit}}
-    .actions
-      .action(v-for="action in actions")
+    .control-item(v-for="button in actionButtons")
+      .digit(v-if="button.type === 'digit'")
+        RoundButton(@click="handleActionClick(button)" size="45px")
+          template(v-slot:child) {{button.action}}
+      .action(v-else-if="button.type === 'action'")
         RoundButton(
-          @click="handleActionClick(action)"
-          size="45px"
-          variant="grey"
-        )
-          template(v-slot:child) {{action}}
+            @click="handleActionClick(button)"
+            size="45px"
+            variant="grey"
+          )
+            template(v-slot:child) {{button.action}}
 button(@click="nextQuestion") Next
 </template>
 
@@ -69,7 +68,6 @@ type State = {
   endTime: Date
   currentTime: Date
   timer: ReturnType<typeof setTimeout> | null
-  // inputs: { value: string }[]
   inputs: string[]
 }
 
@@ -121,6 +119,26 @@ export default defineComponent({
       const seconds = this.timeLeft.getSeconds();
 
       return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
+    },
+    actionButtons() {
+      return [
+        { action: '1', type: 'digit' },
+        { action: '2', type: 'digit' },
+        { action: '3', type: 'digit' },
+        { action: '<', type: 'action' },
+        { action: '4', type: 'digit' },
+        { action: '5', type: 'digit' },
+        { action: '6', type: 'digit' },
+        { action: '>', type: 'action' },
+        { action: '7', type: 'digit' },
+        { action: '8', type: 'digit' },
+        { action: '9', type: 'digit' },
+        { action: '?', type: 'action' },
+        { action: '', type: 'blank' },
+        { action: '0', type: 'digit' },
+        { action: '', type: 'blank' },
+        { action: '=', type: 'action' },
+      ];
     },
     digits(): number[] {
       return [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
@@ -197,8 +215,6 @@ export default defineComponent({
       } else {
         this.$router.push({ name: 'Home' });
       }
-    },
-    handleDigitClick(digit: number) {
     },
     handleActionClick(action: string) {
     },
@@ -344,6 +360,16 @@ export default defineComponent({
   width: 400px;
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.control-item {
+  flex: 0 0 25%;
+  padding-bottom: 16px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
 }
 
 .digits {
@@ -355,19 +381,6 @@ export default defineComponent({
 .actions {
   display: flex;
   flex-direction: column;
-}
-
-.action {
-  padding-bottom: 16px;
-}
-
-.digit {
-  flex: 0 0 33.33%;
-  padding-bottom: 16px;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
 }
 
 .question-expression {
