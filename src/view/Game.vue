@@ -250,6 +250,10 @@ export default defineComponent({
       if (action.action === '<') {
         this.setSelectedInput(this.selectedInput - 1);
       }
+
+      if (action.type === 'digit') {
+        this.inputs[this.selectedInput].value += action.action;
+      }
     },
     nextQuestion() {
       const question = this.generateNextQuestion();
