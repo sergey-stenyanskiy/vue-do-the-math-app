@@ -32,6 +32,7 @@ module.exports = {
     "max-len": "off",
     "object-curly-newline": "off",
     "no-param-reassign": "off",
-    "vue/multi-word-component-names": "off"
+    "vue/multi-word-component-names": "off",
+    "@typescript-eslint/ban-ts-comment": "off"
   },
 };
