@@ -10,21 +10,28 @@
       v-for="(term, i) in expression"
       :class="[`expression-term-${term.type}`, { 'mr-1': i < expression.length - 1 }]"
     )
-      input.input-number(type="text" v-if="term.type === 'skip'" v-model="inputs[term.inputIndex]")
+      input.input-number(
+        type="text"
+        v-if="term.type === 'skip'"
+        v-model="inputs[term.inputIndex].value"
+        :class="{ 'selected': selectedInput === term.inputIndex }"
+        :ref="`input${term.inputIndex}`"
+        @focus="selectedInput = term.inputIndex"
+      )
       span(v-else) {{term.term}}
     span.question-mark ?
   .controls
-    .control-item(v-for="button in actionButtons")
-      .digit(v-if="button.type === 'digit'")
-        RoundButton(@click="handleActionClick(button)" size="45px")
-          template(v-slot:child) {{button.action}}
-      .action(v-else-if="button.type === 'action'")
+    .control-item(v-for="action in buttonActions")
+      .digit(v-if="action.type === 'digit'")
+        RoundButton(@click="handleActionClick(action)" size="45px")
+          template(v-slot:child) {{action.action}}
+      .action(v-else-if="action.type === 'action'")
         RoundButton(
-            @click="handleActionClick(button)"
+            @click="handleActionClick(action)"
             size="45px"
             variant="grey"
           )
-            template(v-slot:child) {{button.action}}
+            template(v-slot:child) {{action.action}}
 button(@click="nextQuestion") Next
 </template>
 
@@ -68,12 +75,18 @@ type State = {
   endTime: Date
   currentTime: Date
   timer: ReturnType<typeof setTimeout> | null
-  inputs: string[]
+  inputs: { value: string }[]
+  selectedInput: number
 }
 
 type HasTimer = {
   updateTime: (date: Date) => void
   timer: ReturnType<typeof setTimeout>
+}
+
+type ButtonAction = {
+  action: string
+  type: 'digit' | 'blank' | 'action'
 }
 
 
@@ -107,7 +120,8 @@ export default defineComponent({
       endTime,
       currentTime: startTime,
       timer: null,
-      inputs: []
+      inputs: [],
+      selectedInput: -1
     };
   },
   computed: {
@@ -120,7 +134,7 @@ export default defineComponent({
 
       return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
     },
-    actionButtons() {
+    buttonActions(): ButtonAction[] {
       return [
         { action: '1', type: 'digit' },
         { action: '2', type: 'digit' },
@@ -216,9 +230,45 @@ export default defineComponent({
         this.$router.push({ name: 'Home' });
       }
     },
-    handleActionClick(action: string) {
+    setSelectedInput(index: number) {
+      this.selectedInput = Math.max(0, Math.min(this.inputs.length - 1, index));
+
+      this.focusInput(this.selectedInput);
+    },
+    focusInput(index: number) {
+      const input = this.$refs[`input${index}`] as HTMLInputElement;
+
+      if (input) {
+        input.focus();
+      }
+    },
+    handleActionClick(action: ButtonAction) {
+      if (action.action === '>') {
+        this.setSelectedInput(this.selectedInput + 1);
+      }
+
+      if (action.action === '<') {
+        this.setSelectedInput(this.selectedInput - 1);
+      }
     },
     nextQuestion() {
+      const question = this.generateNextQuestion();
+
+      this.questions.push(question);
+      this.currentQuestion++;
+
+      this.resetInputState();
+    },
+    resetInputState() {
+      for (let i = 0; i < this.question.hideIndexes.length; i++) {
+        this.inputs[i] = { value: "" };
+      }
+
+      this.selectedInput = 0;
+
+      this.focusInput(0);
+    },
+    generateNextQuestion(): Question {
       const minNumber = 1;
       const maxNumber = 10;
 
@@ -261,11 +311,7 @@ export default defineComponent({
       // eslint-disable-next-line no-new-func
       const answer = (new Function(`return ${expression};`))();
 
-      for (let i = 0; i < hideIndexes.length; i++) {
-        this.inputs[i] = "";
-      }
-
-      this.questions.push({
+      return {
         numbers,
         operators,
         terms,
@@ -273,10 +319,8 @@ export default defineComponent({
         expression,
         answer,
         settings: { ...this.settings }
-      });
-
-      this.currentQuestion++;
-    }
+      }
+    },
   }
 })
 </script>
@@ -348,7 +392,7 @@ export default defineComponent({
   transition: box-shadow, background-color, border-bottom, 0.2s linear;
 }
 
-.input-number:focus {
+.input-number:focus, .input-number.selected {
   border-radius: 2px;
   border-bottom: 1px solid transparent;
 
