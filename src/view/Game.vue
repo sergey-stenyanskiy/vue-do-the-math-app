@@ -6,10 +6,12 @@
       span Отмена
     .timer {{displayedTime}}
   .question-expression.mb-5
-    span.expression-term(
+    .expression-term(
       v-for="(term, i) in expression"
       :class="[`expression-term-${term.type}`, { 'mr-1': i < expression.length - 1 }]"
-    ) {{term.term}}
+    )
+      input.input-number(type="text" v-if="term.type === 'skip'" v-model="inputs[term.inputIndex]")
+      span(v-else) {{term.term}}
     span.question-mark ?
   .controls
     .digits
@@ -47,6 +49,7 @@ type ExpressionTermType = 'number' | 'operator' | 'equals' | 'answer' | 'skip'
 type ExpressionTerm = {
   term: string
   type: ExpressionTermType
+  inputIndex?: number
 }
 
 type Question = {
@@ -66,6 +69,8 @@ type State = {
   endTime: Date
   currentTime: Date
   timer: ReturnType<typeof setTimeout> | null
+  // inputs: { value: string }[]
+  inputs: string[]
 }
 
 type HasTimer = {
@@ -103,7 +108,8 @@ export default defineComponent({
       startTime,
       endTime,
       currentTime: startTime,
-      timer: null
+      timer: null,
+      inputs: []
     };
   },
   computed: {
@@ -132,13 +138,15 @@ export default defineComponent({
       const terms: ExpressionTerm[] = [];
 
       if (this.question) {
+        let inputIndex = 0;
+
         this.question.terms.forEach((term, i) => {
           const { number, operator } = term;
 
           if (!this.question.hideIndexes.includes(i)) {
             terms.push({ term: number.toString(), type: 'number' });
           } else {
-            terms.push({ term: ' ', type: 'skip' });
+            terms.push({ term: ' ', type: 'skip', inputIndex: inputIndex++ });
           }
 
           if (operator) {
@@ -157,6 +165,8 @@ export default defineComponent({
   },
   mounted() {
     this.attachTimer();
+
+    this.nextQuestion();
   },
   unmounted() {
     this.removeTimer();
@@ -235,6 +245,10 @@ export default defineComponent({
       // eslint-disable-next-line no-new-func
       const answer = (new Function(`return ${expression};`))();
 
+      for (let i = 0; i < hideIndexes.length; i++) {
+        this.inputs[i] = "";
+      }
+
       this.questions.push({
         numbers,
         operators,
@@ -303,6 +317,29 @@ export default defineComponent({
   border: 1px solid #C5CAE9;
 }
 
+.input-number {
+  width: 30px;
+  overflow: hidden;
+  padding: 4px;
+  border: none;
+  outline: none;
+
+  border-radius: 0;
+  border-bottom: 1px solid #c0c0c0;
+
+  box-shadow: 0 0 2px 1px rgba(0,0,0,0);
+
+  transition: box-shadow, background-color, border-bottom, 0.2s linear;
+}
+
+.input-number:focus {
+  border-radius: 2px;
+  border-bottom: 1px solid transparent;
+
+  background: #fafafa;
+  box-shadow: 0 0 2px 1px rgba(0,0,0,0.2);
+}
+
 .controls {
   width: 400px;
   display: flex;
@@ -350,11 +387,4 @@ export default defineComponent({
   color: black;
   font-weight: 700;
 }
-
-.expression-term-skip {
-  width: 20px;
-  height: 1em;
-  border-bottom: 1px solid #c0c0c0;
-}
-
 </style>
