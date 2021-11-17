@@ -63,7 +63,8 @@ export default defineComponent({
   border: none;
   outline: none;
   font-family: arial;
-  font-weight: bold;
+  font-weight: 700;
+  font-size: 1em;
   color: black;
 
   display: flex;
@@ -84,6 +85,7 @@ export default defineComponent({
 }
 
 .round-button-grey {
+  color: white;
   background: #7A7A7A;
 }
 </style>
