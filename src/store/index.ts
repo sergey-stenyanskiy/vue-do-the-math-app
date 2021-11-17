@@ -16,7 +16,7 @@ export default createStore({
       state.previousRoute = previousRoute;
     },
     setSettings(state: State, settings: GameSettingsData) {
-      state.settings = { ...settings, ...state.settings };
+      state.settings = { ...state.settings, ...settings };
     }
   },
   actions: {
