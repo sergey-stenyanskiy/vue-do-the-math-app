@@ -1,5 +1,16 @@
 <template lang="pug">
 .game
+  .game-header.mb-5
+    button.back-button(type="button" @click="goBack")
+      SvgIcon.mr-1(name="cross")
+      span Отмена
+    .timer 4:33
+  .question-expression.mb-5
+    span.expression-term(
+      v-for="(term, i) in expression"
+      :class="[`expression-term-${term.type}`, { 'mr-1': i < expression.length - 1 }]"
+    ) {{term.term}}
+    span.question-mark ?
   .controls
     .digits
       .digit(v-for="digit in digits")
@@ -14,7 +25,6 @@
         )
           template(v-slot:child) {{action}}
 button(@click="nextQuestion") Next
-| {{questions}}
 </template>
 
 <script lang="ts">
@@ -24,11 +34,19 @@ import { GameSettings, Operator } from '../types/types'
 
 import { getRandomInt } from '../util/random'
 
+import SvgIcon from '../component/SvgIcon.vue'
 import RoundButton from '../component/RoundButton.vue'
 
-type Term = {
+type QuestionTerm = {
   number: number
   operator: Operator
+}
+
+type ExpressionTermType = 'number' | 'operator' | 'equals' | 'answer' | 'skip'
+
+type ExpressionTerm = {
+  term: string
+  type: ExpressionTermType
 }
 
 type Question = {
@@ -36,7 +54,7 @@ type Question = {
   numbers: number[]
   operators: string[]
   hideIndexes: number[]
-  terms: Term[]
+  terms: QuestionTerm[]
   expression: string
   answer: number
 }
@@ -50,7 +68,8 @@ type State = {
 export default defineComponent({
   name: "Game",
   components: {
-    RoundButton
+    RoundButton,
+    SvgIcon
   },
   beforeRouteLeave(
     from,
@@ -74,11 +93,47 @@ export default defineComponent({
     actions(): string[] {
       return ['<', '>', '?', '='];
     },
-    settings() {
+    settings(): GameSettings {
       return this.$store.state.settings;
+    },
+    question(): Question {
+      return this.questions[this.currentQuestion];
+    },
+    expression(): ExpressionTerm[] {
+      const terms: ExpressionTerm[] = [];
+
+      if (this.question) {
+        this.question.terms.forEach((term, i) => {
+          const { number, operator } = term;
+
+          if (!this.question.hideIndexes.includes(i)) {
+            terms.push({ term: number.toString(), type: 'number' });
+          } else {
+            terms.push({ term: ' ', type: 'skip' });
+          }
+
+          if (operator) {
+            terms.push({ term: operator === '*' ? 'x' : operator, type: 'operator' });
+          }
+        });
+
+        const answer = this.question.answer.toString();
+
+        terms.push({ term: '=', type: 'equals' });
+        terms.push({ term: answer, type: 'answer' });
+      }
+
+      return terms;
     }
   },
   methods: {
+    goBack() {
+      if (this.$store.state.previousRoute !== '') {
+        this.$router.push(this.$store.state.previousRoute);
+      } else {
+        this.$router.push({ name: 'Home' });
+      }
+    },
     handleDigitClick(digit: number) {
     },
     handleActionClick(action: string) {
@@ -97,7 +152,6 @@ export default defineComponent({
 
       const numOperators = numNumbers - 1;
 
-      // const operatorsToChoose: Operator[] = [...this.settings.operators];
       const operators: Operator[] = [];
 
       for (let i = 0; i < numOperators; i++) {
@@ -144,6 +198,57 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+.svg-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.game {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  font-family: arial;
+}
+
+
+.game-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.back-button {
+  outline: none;
+  text-transform: uppercase;
+  margin: 0;
+  padding: 8px 16px;
+  font-family: arial;
+  color: #78909C;
+  border: none;
+  border-radius: 2px;
+  background: white;
+  cursor: pointer;
+  box-shadow: 0 1px 2px 1px #B0BEC5;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.timer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  background: #FAFAFA;
+  color: #78909C;
+  width: 75px;
+  padding: 4px;
+  border: 1px solid #C5CAE9;
+}
+
 .controls {
   width: 400px;
   display: flex;
@@ -173,4 +278,29 @@ export default defineComponent({
   justify-content: center;
   align-items: center;
 }
+
+.question-expression {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 1.18em;
+}
+
+.expression-term, .question-mark {
+  color: #c0c0c0;
+}
+
+.expression-term-number {
+  color: black;
+  font-weight: 700;
+}
+
+.expression-term-skip {
+  width: 20px;
+  height: 1em;
+  border-bottom: 1px solid #c0c0c0;
+}
+
 </style>
