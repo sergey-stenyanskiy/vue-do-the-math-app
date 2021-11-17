@@ -4,7 +4,7 @@
     button.back-button(type="button" @click="goBack")
       SvgIcon.mr-1(name="cross")
       span Отмена
-    .timer 4:33
+    .timer {{displayedTime}}
   .question-expression.mb-5
     span.expression-term(
       v-for="(term, i) in expression"
@@ -62,6 +62,15 @@ type Question = {
 type State = {
   questions: Question[]
   currentQuestion: number
+  startTime: Date
+  endTime: Date
+  currentTime: Date
+  timer: ReturnType<typeof setTimeout> | null
+}
+
+type HasTimer = {
+  updateTime: (date: Date) => void
+  timer: ReturnType<typeof setTimeout>
 }
 
 
@@ -81,12 +90,32 @@ export default defineComponent({
     next();
   },
   data(): State {
+    const { timeConstraint } = this.$store.state.settings;
+
+    const startTime = new Date();
+
+    const endTime = new Date(startTime.getTime());
+    endTime.setMinutes(endTime.getMinutes() + timeConstraint);
+
     return {
       questions: [],
-      currentQuestion: -1
+      currentQuestion: -1,
+      startTime,
+      endTime,
+      currentTime: startTime,
+      timer: null
     };
   },
   computed: {
+    timeLeft(): Date {
+      return new Date(this.endTime.getTime() - this.currentTime.getTime());
+    },
+    displayedTime(): string {
+      const minutes = this.timeLeft.getMinutes();
+      const seconds = this.timeLeft.getSeconds();
+
+      return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
+    },
     digits(): number[] {
       return [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
     },
@@ -126,7 +155,32 @@ export default defineComponent({
       return terms;
     }
   },
+  mounted() {
+    this.attachTimer();
+  },
+  unmounted() {
+    this.removeTimer();
+  },
   methods: {
+    attachTimer() {
+      this.timer = setTimeout((function timerfun(this: HasTimer) {
+        const time = new Date();
+
+        this.updateTime(time);
+
+        // @ts-ignore
+        this.timer = setTimeout(timerfun.bind(this), 1000);
+      // @ts-ignore
+      }).bind(this), 0);
+    },
+    removeTimer() {
+      if (this.timer) {
+        // clearTimeout(this.timer);
+      }
+    },
+    updateTime(time: Date) {
+      this.currentTime = new Date(time.getTime());
+    },
     goBack() {
       if (this.$store.state.previousRoute !== '') {
         this.$router.push(this.$store.state.previousRoute);
