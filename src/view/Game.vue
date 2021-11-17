@@ -20,13 +20,32 @@ button(@click="nextQuestion") Next
 <script lang="ts">
 import { defineComponent } from 'vue'
 
-import { Operator } from '../types/types'
+import { GameSettings, Operator } from '../types/types'
+
+import { getRandomInt } from '../util/random'
 
 import RoundButton from '../component/RoundButton.vue'
 
-type State = {
-  questions: string[]
+type Term = {
+  number: number
+  operator: Operator
 }
+
+type Question = {
+  settings: GameSettings
+  numbers: number[]
+  operators: string[]
+  hideIndexes: number[]
+  terms: Term[]
+  expression: string
+  answer: number
+}
+
+type State = {
+  questions: Question[]
+  currentQuestion: number
+}
+
 
 export default defineComponent({
   name: "Game",
@@ -44,7 +63,8 @@ export default defineComponent({
   },
   data(): State {
     return {
-      questions: []
+      questions: [],
+      currentQuestion: -1
     };
   },
   computed: {
@@ -62,47 +82,62 @@ export default defineComponent({
     handleDigitClick(digit: number) {
     },
     handleActionClick(action: string) {
-
-    },
-    getRandomInt(min: number, max: number) {
-      min = Math.ceil(min);
-      max = Math.floor(max);
-
-      return Math.floor(Math.random() * (max - min)) + min;
     },
     nextQuestion() {
-      const minDigit = 1;
-      const maxDigit = 10;
+      const minNumber = 1;
+      const maxNumber = 10;
 
-      const numDigits = this.settings.difficulty + 1;
-      const numOperators = numDigits - 1;
+      const numNumbers = this.settings.difficulty + 1;
 
-      const digits: number[] = [];
-      const operators: Operator[] = [];
+      const numbers: number[] = [];
 
-      for (let i = 0; i < numDigits; i++) {
-        digits.push(this.getRandomInt(minDigit, maxDigit + 1));
+      for (let i = 0; i < numNumbers; i++) {
+        numbers.push(getRandomInt(minNumber, maxNumber + 1));
       }
 
+      const numOperators = numNumbers - 1;
+
+      // const operatorsToChoose: Operator[] = [...this.settings.operators];
+      const operators: Operator[] = [];
+
       for (let i = 0; i < numOperators; i++) {
-        const index = this.getRandomInt(0, this.settings.operators.length);
+        const index = getRandomInt(0, this.settings.operators.length);
 
         operators.push(this.settings.operators[index]);
       }
 
-      const terms = digits.map((digit, i) => ({ digit, operator: operators[i] }));
+      const terms = numbers.map((number, i) => ({ number, operator: operators[i] }));
 
-      let acum = '';
+      const indexesToChoose: number[] = (new Array(numNumbers)).fill(0).map((item, i) => i);
+      const hideIndexes: number[] = [];
 
-      for (let i = 0; i < terms.length; i++) {
-        acum += terms[i].digit.toString();
+      for (let i = 0; i < this.settings.difficulty; i++) {
+        const index = getRandomInt(0, indexesToChoose.length);
 
-        if (terms[i].operator) {
-          acum += terms[i].operator;
-        }
+        hideIndexes.push(indexesToChoose[index]);
+        indexesToChoose.splice(index, 1);
       }
 
-      this.questions.push(acum);
+      let expression = '';
+
+      for (let i = 0; i < terms.length; i++) {
+        expression += terms[i].number + (terms[i].operator ?? '');
+      }
+
+      // eslint-disable-next-line no-new-func
+      const answer = (new Function(`return ${expression};`))();
+
+      this.questions.push({
+        numbers,
+        operators,
+        terms,
+        hideIndexes,
+        expression,
+        answer,
+        settings: { ...this.settings }
+      });
+
+      this.currentQuestion++;
     }
   }
 })

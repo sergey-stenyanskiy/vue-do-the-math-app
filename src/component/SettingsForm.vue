@@ -5,7 +5,7 @@ form#settings-form(@submit.prevent="handleSubmit")
   .mb-1
   label(for="time-constraint") Длительность {{timeConstraint}} минут
   .mb-1
-  input#settings-difficulty(type="range" min="1" max="10" step="1" v-model="difficulty")
+  input#settings-difficulty(type="range" min="1" max="5" step="1" v-model="difficulty")
   .mb-1
   label(for="difficulty") Сложность {{difficulty}}
   .operators
@@ -66,8 +66,8 @@ export default defineComponent({
   methods: {
     handleSubmit() {
       this.$store.dispatch('setSettings', {
-        timeConstraint: this.timeConstraint,
-        difficulty: this.difficulty,
+        timeConstraint: +this.timeConstraint,
+        difficulty: +this.difficulty,
         operators: [...this.operators]
       });
 
