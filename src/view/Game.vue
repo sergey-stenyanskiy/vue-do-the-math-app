@@ -5,10 +5,10 @@
       SvgIcon.mr-1(name="cross")
       span Отмена
     .timer {{displayedTime}}
-  .question-expression.mb-5
-    .expression-term(
-      v-for="(term, i) in expression"
-      :class="[`expression-term-${term.type}`, { 'mr-1': i < expression.length - 1 }]"
+  .question-expression.mb-5(v-if="question")
+    .expression-term.mr-1(
+      v-for="(term, i) in questionExpression"
+      :class="`expression-term-${term.type}`"
     )
       input.input-number(
         type="text"
@@ -16,9 +16,12 @@
         v-model="inputs[term.inputIndex].value"
         :class="{ 'selected': selectedInput === term.inputIndex }"
         :ref="`input${term.inputIndex}`"
-        @focus="selectedInput = term.inputIndex"
+        @focus="selectedInput = term.inputIndex, $event.currentTarget.select()"
       )
-      span(v-else) {{term.term}}
+      span(v-else) {{term.label}}
+    .expression-term.expression-equals =
+    .mr-1
+    .expression-term.expression-answer {{question.answer}}
     span.question-mark ?
   .controls
     .control-item(v-for="action in buttonActions")
@@ -54,6 +57,7 @@ type ExpressionTermType = 'number' | 'operator' | 'equals' | 'answer' | 'skip'
 
 type ExpressionTerm = {
   term: string
+  label: string
   type: ExpressionTermType
   inputIndex?: number
 }
@@ -166,7 +170,8 @@ export default defineComponent({
     question(): Question {
       return this.questions[this.currentQuestion];
     },
-    expression(): ExpressionTerm[] {
+    // TODO добавить отображение = и ? выводе вопроса
+    questionExpression(): ExpressionTerm[] {
       const terms: ExpressionTerm[] = [];
 
       if (this.question) {
@@ -176,20 +181,24 @@ export default defineComponent({
           const { number, operator } = term;
 
           if (!this.question.hideIndexes.includes(i)) {
-            terms.push({ term: number.toString(), type: 'number' });
+            terms.push({ term: number.toString(), label: number.toString(), type: 'number' });
           } else {
-            terms.push({ term: ' ', type: 'skip', inputIndex: inputIndex++ });
+            terms.push({
+              term: ' ',
+              label: ' ',
+              type: 'skip',
+              inputIndex: inputIndex++
+            });
           }
 
           if (operator) {
-            terms.push({ term: operator === '*' ? 'x' : operator, type: 'operator' });
+            terms.push({
+              term: operator,
+              label: operator === '*' ? 'x' : operator,
+              type: 'operator'
+            });
           }
         });
-
-        const answer = this.question.answer.toString();
-
-        terms.push({ term: '=', type: 'equals' });
-        terms.push({ term: answer, type: 'answer' });
       }
 
       return terms;
@@ -199,11 +208,48 @@ export default defineComponent({
     this.attachTimer();
 
     this.nextQuestion();
+
+    this.$nextTick(() => this.resetInputState());
   },
   unmounted() {
     this.removeTimer();
   },
   methods: {
+    calculateAnswer(): number | null {
+      let answerExpression = "";
+
+      const questionExpression = this.questionExpression;
+
+      for (const term of questionExpression) {
+        if (term.inputIndex != null) {
+          answerExpression += this.inputs[term.inputIndex].value;
+        } else {
+          answerExpression += term.term;
+        }
+      }
+
+      // TODO обработать случай неправильного выражение в вычисляемой функции
+      // eslint-disable-next-line no-new-func
+      const calc = new Function(`return ${answerExpression};`);
+
+      const result = calc();
+
+      return result;
+    },
+    checkAnswer() {
+      const answer = this.calculateAnswer();
+
+      if (answer == null) {
+        // TODO добавить сообщение об ошибке при неверном выражении
+      } else if (answer === this.question.answer) {
+        // TODO добавить сообщение о правильном ответе
+        // TODO добавить предложение перейти к следующему вопросу
+      } else {
+        // TODO добавить сообщение о неправильном ответе
+        // TODO добавить стили состояния элементов интерфейса при неправильном ответе
+      }
+    },
+    // TODO переименовать
     attachTimer() {
       this.timer = setTimeout((function timerfun(this: HasTimer) {
         const time = new Date();
@@ -215,8 +261,12 @@ export default defineComponent({
       // @ts-ignore
       }).bind(this), 0);
     },
+    // TODO переименовать
     removeTimer() {
       if (this.timer) {
+        // TODO ошибка при построении проекта -- несоответствие типов аргумента clearTimeout и
+        // this.timer; найти способ корректного разрешения определений typescript
+
         // clearTimeout(this.timer);
       }
     },
@@ -235,6 +285,7 @@ export default defineComponent({
 
       this.focusInput(this.selectedInput);
     },
+    // TODO дать более осмысленное имя
     focusInput(index: number) {
       const input = this.$refs[`input${index}`] as HTMLInputElement;
 
@@ -242,6 +293,8 @@ export default defineComponent({
         input.focus();
       }
     },
+    // TODO добавить фокусировку на активном текстовом поле при нажатии на кнопку действия
+    // TODO вынести логику обработки действия в отдельный метод
     handleActionClick(action: ButtonAction) {
       if (action.action === '>') {
         this.setSelectedInput(this.selectedInput + 1);
@@ -254,6 +307,12 @@ export default defineComponent({
       if (action.type === 'digit') {
         this.inputs[this.selectedInput].value += action.action;
       }
+
+      if (action.action === '=') {
+        this.checkAnswer();
+      }
+
+      this.focusInput(this.selectedInput);
     },
     nextQuestion() {
       const question = this.generateNextQuestion();
@@ -272,6 +331,9 @@ export default defineComponent({
 
       this.focusInput(0);
     },
+    // TODO сделать функцию генерации вопроса независимой от компонента, необходимые параметры
+    // генерации передавать в аргументах
+    // TODO возможно вынести в отдельный файл
     generateNextQuestion(): Question {
       const minNumber = 1;
       const maxNumber = 10;
