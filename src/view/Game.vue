@@ -36,6 +36,17 @@
           )
             template(v-slot:child) {{action.action}}
 button(@click="nextQuestion") Next
+teleport(to="body")
+  .message
+    transition(name="fade-bubble")
+      .alert-message.alert-message-info.alert-message-bad-input(v-if="showBadInput")
+        | Неверное выражение
+    transition(name="fade-bubble")
+      .alert-message.alert-message-danger.alert-message-incorrect-answer(v-if="showAnswerIncorrect")
+        | Неверный ответ!
+    transition(name="fade-bubble")
+      .alert-message.alert-message-success.alert-message-correct-answer(v-if="showAnswerCorrect")
+        | Правильный ответ!
 </template>
 
 <script lang="ts">
@@ -81,6 +92,9 @@ type State = {
   timer: ReturnType<typeof setTimeout> | null
   inputs: { value: string }[]
   selectedInput: number
+  showAnswerCorrect: boolean
+  showAnswerIncorrect: boolean
+  showBadInput: boolean
 }
 
 type HasTimer = {
@@ -125,7 +139,10 @@ export default defineComponent({
       currentTime: startTime,
       timer: null,
       inputs: [],
-      selectedInput: -1
+      selectedInput: -1,
+      showAnswerCorrect: false,
+      showAnswerIncorrect: false,
+      showBadInput: false,
     };
   },
   computed: {
@@ -215,7 +232,35 @@ export default defineComponent({
     this.removeTimer();
   },
   methods: {
+    toggleShowBadInput() {
+      this.showBadInput = true;
+
+      setTimeout(() => { this.showBadInput = false; }, 1500);
+    },
+    toggleShowAnswerCorrect() {
+      this.showAnswerCorrect = true;
+
+      setTimeout(() => { this.showAnswerCorrect = false; }, 1500);
+    },
+    toggleShowAnswerInсorrect() {
+      this.showAnswerIncorrect = true;
+
+      setTimeout(() => { this.showAnswerIncorrect = false; }, 1500);
+    },
+    validateInput(): boolean {
+      for (const { value } of this.inputs) {
+        if (!value || value === '' || Number.isNaN(+value)) {
+          return false;
+        }
+      }
+
+      return true;
+    },
     calculateAnswer(): number | null {
+      if (!this.validateInput()) {
+        return null;
+      }
+
       let answerExpression = "";
 
       const questionExpression = this.questionExpression;
@@ -228,24 +273,22 @@ export default defineComponent({
         }
       }
 
-      // TODO обработать случай неправильного выражение в вычисляемой функции
       // eslint-disable-next-line no-new-func
       const calc = new Function(`return ${answerExpression};`);
 
-      const result = calc();
-
-      return result;
+      return calc();
     },
     checkAnswer() {
       const answer = this.calculateAnswer();
 
       if (answer == null) {
-        // TODO добавить сообщение об ошибке при неверном выражении
+        this.toggleShowBadInput();
       } else if (answer === this.question.answer) {
         // TODO добавить сообщение о правильном ответе
+        this.toggleShowAnswerCorrect();
         // TODO добавить предложение перейти к следующему вопросу
       } else {
-        // TODO добавить сообщение о неправильном ответе
+        this.toggleShowAnswerInсorrect();
         // TODO добавить стили состояния элементов интерфейса при неправильном ответе
       }
     },
@@ -293,7 +336,6 @@ export default defineComponent({
         input.focus();
       }
     },
-    // TODO добавить фокусировку на активном текстовом поле при нажатии на кнопку действия
     // TODO вынести логику обработки действия в отдельный метод
     handleActionClick(action: ButtonAction) {
       if (action.action === '>') {
@@ -405,7 +447,6 @@ export default defineComponent({
   font-family: arial;
 }
 
-
 .game-header {
   display: flex;
   flex-direction: row;
@@ -509,5 +550,61 @@ export default defineComponent({
 .expression-term-number {
   color: black;
   font-weight: 700;
+}
+
+.message {
+  position: relative;
+}
+
+.alert-message {
+  font-family: arial;
+  font-size: 1.05em;
+  border-radius: 4px;
+  padding: 8px 16px;
+
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+
+  width: 180px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.alert-message-success {
+  border: 1px solid #43A047;
+  color: #43A047;
+  background: #C8E6C9;
+}
+
+.alert-message-info {
+  border: 1px solid #E65100;
+  color: #E65100;
+  background: #FFF8E1;
+}
+
+.alert-message-danger {
+  border: 1px solid #C62828;
+  color: #C62828;
+  background: #FFEBEE;
+}
+
+.fade-bubble-enter-from {
+  opacity: 0;
+  top: 4px;
+}
+
+.fade-bubble-leave-to {
+  opacity: 0;
+}
+
+.fade-bubble-leave-from, .fade-bubble-enter-to {
+  opacity: 1;
+  top: 0;
+}
+
+.fade-bubble-enter-active, .fade-bubble-leave-active {
+  transition: opacity, 0.1s ease-in;
 }
 </style>
