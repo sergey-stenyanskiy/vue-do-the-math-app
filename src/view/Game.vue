@@ -47,7 +47,10 @@
 teleport(to="body")
   .message
     transition(name="fade-bubble")
-      .alert-message.alert-message-info.alert-message-bad-input(v-if="showBadInput")
+      .alert-message.alert-message-info.alert-message-bad-input(v-if="showGiveUpOnQuestion")
+        | Показан верный ответ
+    transition(name="fade-bubble")
+      .alert-message.alert-message-warning.alert-message-bad-input(v-if="showBadInput")
         | Неверное выражение
     transition(name="fade-bubble")
       .alert-message.alert-message-danger.alert-message-incorrect-answer(v-if="showAnswerIncorrect")
@@ -77,6 +80,7 @@ type State = {
   messageTimer: number
   inputs: { value: string }[]
   selectedInput: number
+  showGiveUpOnQuestion: boolean
   showAnswerCorrect: boolean
   showAnswerIncorrect: boolean
   showBadInput: boolean
@@ -122,6 +126,7 @@ export default defineComponent({
       messageTimer: -1,
       inputs: [],
       selectedInput: -1,
+      showGiveUpOnQuestion: false,
       showAnswerCorrect: false,
       showAnswerIncorrect: false,
       showBadInput: false,
@@ -258,6 +263,9 @@ export default defineComponent({
 
       this.questionCompleted = true;
     },
+    setShowGiveUpOnQuestion(show: boolean) {
+      this.showGiveUpOnQuestion = show;
+    },
     setShowBadInput(show: boolean) {
       this.showBadInput = show;
     },
@@ -280,6 +288,9 @@ export default defineComponent({
       this.clearMessageTimer();
 
       this.messageTimer = window.setTimeout(() => setInput(false), 1500);
+    },
+    toggleShowGiveUpOnQuestion() {
+      this.toggleInput(this.setShowGiveUpOnQuestion);
     },
     toggleShowBadInput() {
       this.toggleInput(this.setShowBadInput);
@@ -389,6 +400,8 @@ export default defineComponent({
       }
 
       if (action.action === '?') {
+        this.toggleShowGiveUpOnQuestion();
+
         this.completeQuestion();
       }
     },
@@ -569,10 +582,16 @@ export default defineComponent({
   background: #C8E6C9;
 }
 
-.alert-message-info {
-  border: 1px solid #E65100;
-  color: #E65100;
+.alert-message-warning {
+  border: 1px solid #FFC107;
+  color: #FFC107;
   background: #FFF8E1;
+}
+
+.alert-message-info {
+  border: 1px solid #17A2B8;
+  color: #17A2B8;
+  background: #D1ECF1;
 }
 
 .alert-message-danger {
