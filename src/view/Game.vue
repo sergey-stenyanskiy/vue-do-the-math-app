@@ -376,13 +376,14 @@ export default defineComponent({
     },
     // TODO переименовать
     attachTimer() {
-      this.timer = window.setTimeout((function timerfun(this: HasTimer) {
+      const it = this;
+
+      this.timer = window.setTimeout((function timerfun(this: typeof it) {
         const time = new Date();
 
         this.updateTime(time);
 
-        this.timer = setTimeout(timerfun.bind(this), 1000);
-      // @ts-ignore
+        this.timer = window.setTimeout(timerfun.bind(this), 1000);
       }).bind(this), 0);
     },
     // TODO переименовать
