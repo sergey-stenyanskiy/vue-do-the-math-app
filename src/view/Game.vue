@@ -269,11 +269,9 @@ export default defineComponent({
       return answerExpression;
     },
     userAnswerValue(): number | null {
-      const expr = this.userAnswerExpression;
-
-      if (expr) {
+      if (this.userAnswerExpression) {
         // eslint-disable-next-line no-new-func
-        const calc = new Function(`return ${expr};`);
+        const calc = new Function(`return ${this.userAnswerExpression};`);
 
         return calc();
       }
@@ -296,10 +294,10 @@ export default defineComponent({
   },
   methods: {
     completeQuestion() {
-      this.questionCompleted = true;
-
       this.saveUserAnswer();
       this.makeStat();
+
+      this.questionCompleted = true;
     },
     toggleShowBadInput() {
       this.showBadInput = true;
