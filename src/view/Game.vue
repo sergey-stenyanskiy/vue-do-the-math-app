@@ -577,25 +577,21 @@ export default defineComponent({
 }
 
 .alert-message-success {
-  border: 1px solid #43A047;
   color: #43A047;
   background: #C8E6C9;
 }
 
 .alert-message-warning {
-  border: 1px solid #FFC107;
   color: #FFC107;
   background: #FFF8E1;
 }
 
 .alert-message-info {
-  border: 1px solid #17A2B8;
   color: #17A2B8;
   background: #D1ECF1;
 }
 
 .alert-message-danger {
-  border: 1px solid #C62828;
   color: #C62828;
   background: #FFEBEE;
 }
