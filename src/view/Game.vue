@@ -81,7 +81,6 @@ type State = {
   showAnswerIncorrect: boolean
   showBadInput: boolean
   questionCompleted: boolean
-  userAnswer: UserAnswer
   stats: GameStats
 }
 
@@ -127,10 +126,6 @@ export default defineComponent({
       showAnswerIncorrect: false,
       showBadInput: false,
       questionCompleted: false,
-      userAnswer: {
-        input: [],
-        value: null
-      },
       stats: []
     };
   },
@@ -190,7 +185,7 @@ export default defineComponent({
 
             if (this.questionCompleted) {
               if (this.userAnswerCorrect) {
-                const answerTerm = this.userAnswer.input[inputIndex++];
+                const answerTerm = this.inputs[inputIndex++].value;
 
                 terms.push({ term: answerTerm, label: answerTerm, type: 'number' });
               } else {
@@ -259,7 +254,6 @@ export default defineComponent({
   },
   methods: {
     completeQuestion() {
-      this.saveUserAnswer();
       this.makeStat();
 
       this.questionCompleted = true;
@@ -305,16 +299,15 @@ export default defineComponent({
 
       return true;
     },
-    saveUserAnswer() {
-      if (this.validateUserInput()) {
-        this.userAnswer.input = this.inputs.map((input) => input.value);
-        this.userAnswer.value = this.userAnswerValue;
-      }
-    },
     makeStat() {
+      const userAnswer: UserAnswer = {
+        input: this.validateUserInput() ? this.inputs.map((input) => input.value) : [],
+        value: this.validateUserInput() ? this.userAnswerValue : null
+      };
+
       this.stats.push({
         question: this.question,
-        userAnswer: this.userAnswer,
+        userAnswer,
         userAnswerCorrect: this.userAnswerCorrect
       })
     },
@@ -409,11 +402,6 @@ export default defineComponent({
       this.resetInputState();
     },
     resetGameState() {
-      this.userAnswer = {
-        input: [],
-        value: null
-      }
-
       this.questionCompleted = false;
     },
     resetInputState() {
