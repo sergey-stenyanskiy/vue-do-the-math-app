@@ -26,13 +26,18 @@
   .controls
     .control-item(v-for="action in buttonActions")
       .digit(v-if="action.type === 'digit'")
-        RoundButton(@click="handleActionClick(action)" size="45px")
+        RoundButton(
+          @click="handleActionClick(action)"
+          size="45px"
+          :disabled="questionCompleted"
+        )
           template(v-slot:child) {{action.action}}
       .action(v-else-if="action.type === 'action'")
         RoundButton(
             @click="handleActionClick(action)"
             size="45px"
-            variant="grey"
+            variant="blue-grey"
+            :disabled="questionCompleted"
           )
             template(v-slot:child) {{action.action}}
 button(@click="nextQuestion") Next

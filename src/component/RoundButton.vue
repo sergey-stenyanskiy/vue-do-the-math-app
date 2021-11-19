@@ -18,7 +18,7 @@ export default defineComponent({
   props: {
     variant: {
       type: String,
-      default: 'red'
+      default: 'deep-orange'
     },
     type: {
       type: String,
@@ -85,12 +85,25 @@ export default defineComponent({
   box-shadow: 0 2px 4px 2px rgba(0,0,0,0.2);
 }
 
-.round-button-red {
-  background: #F9734D;
+.round-button:disabled {
+  cursor: default;
 }
 
-.round-button-grey {
+.round-button-deep-orange {
+  background: #FF5722;
+}
+
+.round-button-deep-orange:disabled {
+  background: #FFCCBC;
+  color: #f0f0f0;
+}
+
+.round-button-blue-grey {
   color: white;
-  background: #7A7A7A;
+  background: #546E7A;
+}
+
+.round-button-blue-grey:disabled {
+  background: #B0BEC5;
 }
 </style>
