@@ -425,7 +425,16 @@ export default defineComponent({
       this.questions.push(question);
       this.currentQuestion++;
 
+      this.resetGameState();
       this.resetInputState();
+    },
+    resetGameState() {
+      this.userAnswer = {
+        input: [],
+        value: null
+      }
+
+      this.questionCompleted = false;
     },
     resetInputState() {
       for (let i = 0; i < this.question.hideIndexes.length; i++) {
