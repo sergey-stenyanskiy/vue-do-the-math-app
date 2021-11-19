@@ -22,7 +22,7 @@
     .expression-term.expression-equals =
     .mr-1
     .expression-term.expression-answer {{question.answer}}
-    span.question-mark ?
+    span.question-mark(v-if="!questionCompleted") ?
   .controls
     .control-item(v-for="action in buttonActions")
       .digit(v-if="action.type === 'digit'")
@@ -83,6 +83,11 @@ type Question = {
   answer: number
 }
 
+type UserAnswer = {
+  input: string[]
+  value: number | null
+}
+
 type State = {
   questions: Question[]
   currentQuestion: number
@@ -96,7 +101,7 @@ type State = {
   showAnswerIncorrect: boolean
   showBadInput: boolean
   questionCompleted: boolean
-  userAnswer: string[]
+  userAnswer: UserAnswer
 }
 
 type HasTimer = {
@@ -146,7 +151,10 @@ export default defineComponent({
       showAnswerIncorrect: false,
       showBadInput: false,
       questionCompleted: false,
-      userAnswer: []
+      userAnswer: {
+        input: [],
+        value: null
+      }
     };
   },
   computed: {
@@ -205,10 +213,8 @@ export default defineComponent({
             const numTerm = number.toString();
 
             if (this.questionCompleted) {
-              const correctAnswer = true;
-
-              if (correctAnswer) {
-                const answerTerm = this.userAnswer[inputIndex++];
+              if (this.userAnswerCorrect) {
+                const answerTerm = this.userAnswer.input[inputIndex++];
 
                 terms.push({ term: answerTerm, label: answerTerm, type: 'number' });
               } else {
@@ -264,7 +270,7 @@ export default defineComponent({
 
       return null;
     },
-    userAswerCorrect(): boolean {
+    userAnswerCorrect(): boolean {
       return this.userAnswerValue === this.question.answer;
     }
   },
@@ -306,10 +312,18 @@ export default defineComponent({
 
       return true;
     },
+    saveUserAnswer() {
+      if (this.validateUserInput()) {
+        this.userAnswer.input = this.inputs.map((input) => input.value);
+        this.userAnswer.value = this.userAnswerValue;
+      }
+    },
     checkUserAnswer() {
       if (this.userAnswerValue) {
-        if (this.userAswerCorrect) {
+        if (this.userAnswerCorrect) {
           this.toggleShowAnswerCorrect();
+
+          this.completeQuestion();
         } else {
           this.toggleShowAnswerInсorrect();
         }
@@ -377,6 +391,10 @@ export default defineComponent({
 
       if (action.action === '=') {
         this.checkUserAnswer();
+      }
+
+      if (action.action === '?') {
+        this.completeQuestion();
       }
 
       this.focusInput(this.selectedInput);
