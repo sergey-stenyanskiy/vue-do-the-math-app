@@ -60,49 +60,12 @@ teleport(to="body")
 <script lang="ts">
 import { defineComponent } from 'vue'
 
-import { GameSettings, Operator } from '../types/types'
+import { GameSettings, Operator, Question, UserAnswer, GameStats, ExpressionTerm } from '../types/types'
 
 import { getRandomInt } from '../util/random'
 
 import SvgIcon from '../component/SvgIcon.vue'
 import RoundButton from '../component/RoundButton.vue'
-
-type QuestionTerm = {
-  number: number
-  operator: Operator
-}
-
-type ExpressionTermType = 'number' | 'operator' | 'equals' | 'answer' | 'skip'
-
-type ExpressionTerm = {
-  term: string
-  label: string
-  type: ExpressionTermType
-  inputIndex?: number
-}
-
-type Question = {
-  settings: GameSettings
-  numbers: number[]
-  operators: string[]
-  hideIndexes: number[]
-  terms: QuestionTerm[]
-  expression: string
-  answer: number
-}
-
-type UserAnswer = {
-  input: string[]
-  value: number | null
-}
-
-type GameStat = {
-  question: Question
-  userAnswer: UserAnswer | null
-  userAnswerCorrect: boolean
-}
-
-type GameStats = GameStat[]
 
 type State = {
   questions: Question[]
