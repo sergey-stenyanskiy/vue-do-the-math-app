@@ -267,7 +267,7 @@ export default defineComponent({
   },
   methods: {
     completeQuestion() {
-      this.makeStat();
+      this.addStat();
 
       this.questionCompleted = true;
     },
@@ -315,7 +315,7 @@ export default defineComponent({
 
       return true;
     },
-    makeStat() {
+    addStat() {
       const userAnswer: UserAnswer = {
         input: this.validateUserInput() ? this.inputs.map((input) => input.value) : [],
         value: this.validateUserInput() ? this.userAnswerValue : null
