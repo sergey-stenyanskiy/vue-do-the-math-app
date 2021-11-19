@@ -88,7 +88,7 @@ import AlertMessage from '../component/AlertMessage.vue'
 import RoundButton from '../component/RoundButton.vue'
 
 type State = {
-  questions: Question[]
+  question: Question | null
   currentQuestion: number
   startTime: Date
   endTime: Date
@@ -135,7 +135,7 @@ export default defineComponent({
     endTime.setMinutes(endTime.getMinutes() + timeConstraint);
 
     return {
-      questions: [],
+      question: null,
       currentQuestion: -1,
       startTime,
       endTime,
@@ -185,9 +185,6 @@ export default defineComponent({
     settings(): GameSettings {
       return this.$store.state.settings;
     },
-    question(): Question {
-      return this.questions[this.currentQuestion];
-    },
     questionExpressionTerms(): ExpressionTerm[] {
       const terms: ExpressionTerm[] = [];
 
@@ -208,7 +205,7 @@ export default defineComponent({
               } else {
                 terms.push({ term: numTerm, label: numTerm, type: 'number' });
               }
-            } else if (this.question.hideIndexes.includes(i)) {
+            } else if (this.question?.hideIndexes.includes(i)) {
               terms.push({ term: ' ', label: ' ', type: 'skip', inputIndex: inputIndex++ });
             } else {
               terms.push({ term: numTerm, label: numTerm, type: 'number' });
@@ -255,7 +252,7 @@ export default defineComponent({
       return null;
     },
     userAnswerCorrect(): boolean {
-      return this.userAnswerValue === this.question.answer;
+      return this.userAnswerValue === this.question?.answer;
     }
   },
   mounted() {
@@ -325,7 +322,7 @@ export default defineComponent({
       };
 
       this.stats.push({
-        question: this.question,
+        question: this.question!,
         userAnswer,
         userAnswerCorrect: this.userAnswerCorrect
       })
@@ -414,9 +411,8 @@ export default defineComponent({
       }
     },
     nextQuestion() {
-      const question = this.generateNextQuestion();
+      this.question = this.generateNextQuestion();
 
-      this.questions.push(question);
       this.currentQuestion++;
 
       this.resetGameState();
@@ -426,8 +422,10 @@ export default defineComponent({
       this.questionCompleted = false;
     },
     resetInputState() {
-      for (let i = 0; i < this.question.hideIndexes.length; i++) {
-        this.inputs[i] = { value: "" };
+      if (this.question) {
+        for (let i = 0; i < this.question.hideIndexes.length; i++) {
+          this.inputs[i] = { value: "" };
+        }
       }
 
       this.selectedInput = 0;
