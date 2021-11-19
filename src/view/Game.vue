@@ -10,7 +10,7 @@
         span Следующий вопрос
     .timer {{displayedTime}}
   .question-expression.mb-5(v-if="question")
-    .expression-term.mr-1(
+    .expression-term.mr-1.mb-1(
       v-for="(term, i) in questionExpressionTerms"
       :class="`expression-term-${term.type}`"
     )
@@ -538,6 +538,7 @@ export default defineComponent({
   flex-direction: row;
   align-items: center;
   justify-content: center;
+  flex-wrap: wrap;
 
   font-size: 1.18em;
 }
