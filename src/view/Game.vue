@@ -322,26 +322,21 @@ export default defineComponent({
         this.messageTimer = -1;
       }
     },
-    toggleShowBadInput() {
-      this.setShowBadInput(true);
+    toggleInput(setInput: (value: boolean) => void) {
+      setInput(true);
 
       this.resetMessageTimer();
 
-      this.messageTimer = window.setTimeout(() => this.setShowBadInput(false), 1500);
+      this.messageTimer = window.setTimeout(() => setInput(false), 1500);
+    },
+    toggleShowBadInput() {
+      this.toggleInput(this.setShowBadInput);
     },
     toggleShowAnswerCorrect() {
-      this.setShowAnswerCorrect(true);
-
-      this.resetMessageTimer();
-
-      this.messageTimer = window.setTimeout(() => this.setShowAnswerCorrect(false), 1500);
+      this.toggleInput(this.setShowAnswerCorrect);
     },
     toggleShowAnswerInсorrect() {
-      this.setShowAnswerIncorrect(true);
-
-      this.resetMessageTimer();
-
-      this.messageTimer = window.setTimeout(() => this.setShowAnswerIncorrect(false), 1500);
+      this.toggleInput(this.setShowAnswerIncorrect);
     },
     validateUserInput(): boolean {
       for (const { value } of this.inputs) {
