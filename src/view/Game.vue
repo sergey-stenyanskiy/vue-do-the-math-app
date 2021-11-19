@@ -108,6 +108,7 @@ type State = {
   endTime: Date
   currentTime: Date
   timer: ReturnType<typeof setTimeout> | null
+  messageTimer: number
   inputs: { value: string }[]
   selectedInput: number
   showAnswerCorrect: boolean
@@ -159,6 +160,7 @@ export default defineComponent({
       endTime,
       currentTime: startTime,
       timer: null,
+      messageTimer: -1,
       inputs: [],
       selectedInput: -1,
       showAnswerCorrect: false,
@@ -304,20 +306,42 @@ export default defineComponent({
 
       this.questionCompleted = true;
     },
-    toggleShowBadInput() {
-      this.showBadInput = true;
+    setShowBadInput(show: boolean) {
+      this.showBadInput = show;
+    },
+    setShowAnswerCorrect(show: boolean) {
+      this.showAnswerCorrect = show;
+    },
+    setShowAnswerIncorrect(show: boolean) {
+      this.showAnswerIncorrect = show;
+    },
+    resetMessageTimer() {
+      if (this.messageTimer > 0) {
+        window.clearTimeout(this.messageTimer);
 
-      setTimeout(() => { this.showBadInput = false; }, 1500);
+        this.messageTimer = -1;
+      }
+    },
+    toggleShowBadInput() {
+      this.setShowBadInput(true);
+
+      this.resetMessageTimer();
+
+      this.messageTimer = window.setTimeout(() => this.setShowBadInput(false), 1500);
     },
     toggleShowAnswerCorrect() {
-      this.showAnswerCorrect = true;
+      this.setShowAnswerCorrect(true);
 
-      setTimeout(() => { this.showAnswerCorrect = false; }, 1500);
+      this.resetMessageTimer();
+
+      this.messageTimer = window.setTimeout(() => this.setShowAnswerCorrect(false), 1500);
     },
     toggleShowAnswerInсorrect() {
-      this.showAnswerIncorrect = true;
+      this.setShowAnswerIncorrect(true);
 
-      setTimeout(() => { this.showAnswerIncorrect = false; }, 1500);
+      this.resetMessageTimer();
+
+      this.messageTimer = window.setTimeout(() => this.setShowAnswerIncorrect(false), 1500);
     },
     validateUserInput(): boolean {
       for (const { value } of this.inputs) {
