@@ -5,6 +5,7 @@ button.round-button(
   :id="id"
   :class="[customClass, variantClass]"
   :style="sizeStyle"
+  :disabled="disabled"
 )
   slot(name="child")
 </template>
@@ -38,6 +39,10 @@ export default defineComponent({
     size: {
       type: String,
       default: '20px'
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {
