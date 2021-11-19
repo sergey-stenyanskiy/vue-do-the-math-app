@@ -88,6 +88,14 @@ type UserAnswer = {
   value: number | null
 }
 
+type GameStat = {
+  question: Question
+  userAnswer: UserAnswer | null
+  userAnswerCorrect: boolean
+}
+
+type GameStats = GameStat[]
+
 type State = {
   questions: Question[]
   currentQuestion: number
@@ -102,6 +110,7 @@ type State = {
   showBadInput: boolean
   questionCompleted: boolean
   userAnswer: UserAnswer
+  stats: GameStats
 }
 
 type HasTimer = {
@@ -154,7 +163,8 @@ export default defineComponent({
       userAnswer: {
         input: [],
         value: null
-      }
+      },
+      stats: []
     };
   },
   computed: {
@@ -287,6 +297,9 @@ export default defineComponent({
   methods: {
     completeQuestion() {
       this.questionCompleted = true;
+
+      this.saveUserAnswer();
+      this.makeStat();
     },
     toggleShowBadInput() {
       this.showBadInput = true;
@@ -317,6 +330,13 @@ export default defineComponent({
         this.userAnswer.input = this.inputs.map((input) => input.value);
         this.userAnswer.value = this.userAnswerValue;
       }
+    },
+    makeStat() {
+      this.stats.push({
+        question: this.question,
+        userAnswer: this.userAnswer,
+        userAnswerCorrect: this.userAnswerCorrect
+      })
     },
     checkUserAnswer() {
       if (this.userAnswerValue) {
