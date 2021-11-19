@@ -107,7 +107,8 @@ type State = {
   startTime: Date
   endTime: Date
   currentTime: Date
-  timer: ReturnType<typeof setTimeout> | null
+  // TODO переименовать, дать более осмысленное имя
+  timer: number
   messageTimer: number
   inputs: { value: string }[]
   selectedInput: number
@@ -159,7 +160,7 @@ export default defineComponent({
       startTime,
       endTime,
       currentTime: startTime,
-      timer: null,
+      timer: -1,
       messageTimer: -1,
       inputs: [],
       selectedInput: -1,
@@ -375,23 +376,21 @@ export default defineComponent({
     },
     // TODO переименовать
     attachTimer() {
-      this.timer = setTimeout((function timerfun(this: HasTimer) {
+      this.timer = window.setTimeout((function timerfun(this: HasTimer) {
         const time = new Date();
 
         this.updateTime(time);
 
-        // @ts-ignore
         this.timer = setTimeout(timerfun.bind(this), 1000);
       // @ts-ignore
       }).bind(this), 0);
     },
     // TODO переименовать
     removeTimer() {
-      if (this.timer) {
-        // TODO ошибка при построении проекта -- несоответствие типов аргумента clearTimeout и
-        // this.timer; найти способ корректного разрешения определений typescript
+      if (this.timer > 0) {
+        window.clearTimeout(this.timer);
 
-        // clearTimeout(this.timer);
+        this.timer = -1;
       }
     },
     updateTime(time: Date) {
