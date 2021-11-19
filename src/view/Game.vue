@@ -60,9 +60,9 @@ teleport(to="body")
 <script lang="ts">
 import { defineComponent } from 'vue'
 
-import { GameSettings, Operator, Question, UserAnswer, GameStats, ExpressionTerm } from '../types/types'
+import { GameSettings, Question, UserAnswer, GameStats, ExpressionTerm } from '../types/types'
 
-import { getRandomInt } from '../util/random'
+import { generateQuestion } from '../util/util'
 
 import SvgIcon from '../component/SvgIcon.vue'
 import RoundButton from '../component/RoundButton.vue'
@@ -425,61 +425,10 @@ export default defineComponent({
 
       this.focusUserInput(0);
     },
-    // TODO сделать функцию генерации вопроса независимой от компонента, необходимые параметры
-    // генерации передавать в аргументах
-    // TODO возможно вынести в отдельный файл
     generateNextQuestion(): Question {
-      const minNumber = 1;
-      const maxNumber = 10;
-
-      const numNumbers = this.settings.difficulty + 1;
-
-      const numbers: number[] = [];
-
-      for (let i = 0; i < numNumbers; i++) {
-        numbers.push(getRandomInt(minNumber, maxNumber + 1));
-      }
-
-      const numOperators = numNumbers - 1;
-
-      const operators: Operator[] = [];
-
-      for (let i = 0; i < numOperators; i++) {
-        const index = getRandomInt(0, this.settings.operators.length);
-
-        operators.push(this.settings.operators[index]);
-      }
-
-      const terms = numbers.map((number, i) => ({ number, operator: operators[i] }));
-
-      const indexesToChoose: number[] = (new Array(numNumbers)).fill(0).map((item, i) => i);
-      const hideIndexes: number[] = [];
-
-      for (let i = 0; i < this.settings.difficulty; i++) {
-        const index = getRandomInt(0, indexesToChoose.length);
-
-        hideIndexes.push(indexesToChoose[index]);
-        indexesToChoose.splice(index, 1);
-      }
-
-      let expression = '';
-
-      for (let i = 0; i < terms.length; i++) {
-        expression += terms[i].number + (terms[i].operator ?? '');
-      }
-
-      // eslint-disable-next-line no-new-func
-      const answer = (new Function(`return ${expression};`))();
-
-      return {
-        numbers,
-        operators,
-        terms,
-        hideIndexes,
-        expression,
-        answer,
-        settings: { ...this.settings }
-      }
+      return generateQuestion({
+        gameSettings: this.settings
+      });
     },
   }
 })
