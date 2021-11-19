@@ -1,5 +1,6 @@
 <template lang="pug">
-MainView
+.app
+  MainView
 </template>
 
 <script lang="ts">
@@ -16,4 +17,8 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
+.app {
+  width: 600px;
+  margin: auto;
+}
 </style>
