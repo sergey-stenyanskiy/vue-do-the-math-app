@@ -47,13 +47,33 @@
 teleport(to="body")
   .message
     transition(name="fade-bubble")
-      AlertMessage.alert-message-bad-input(message="Показан верный ответ" variant="info" v-if="showGiveUpOnQuestion")
+      AlertMessage.alert-message-correct-answer(
+        message="Верный ответ!"
+        variant="success"
+        v-if="showAnswerCorrect"
+        :class="{ 'alert-message-on-top': lastShownInput === 1 }"
+      )
     transition(name="fade-bubble")
-      AlertMessage.alert-message-bad-input(message="Неверное выражение" variant="warning" v-if="showBadInput")
+      AlertMessage.alert-message-incorrect-answer(
+        message="Неверный ответ!"
+        variant="danger"
+        v-if="showAnswerIncorrect"
+        :class="{ 'alert-message-on-top': lastShownInput === 2 }"
+      )
     transition(name="fade-bubble")
-      AlertMessage.alert-message-incorrect-answer(message="Неверный ответ!" variant="danger" v-if="showAnswerIncorrect")
+      AlertMessage.alert-message-bad-input(
+        message="Неверное выражение"
+        variant="warning"
+        v-if="showBadInput"
+        :class="{ 'alert-message-on-top': lastShownInput === 3 }"
+      )
     transition(name="fade-bubble")
-      AlertMessage.alert-message-correct-answer(message="Неверный ответ!" variant="success" v-if="showAnswerCorrect")
+      AlertMessage.alert-message-give-up(
+        message="Показан верный ответ"
+        variant="info"
+        v-if="showGiveUpOnQuestion"
+        :class="{ 'alert-message-on-top': lastShownInput === 4 }"
+      )
 </template>
 
 <script lang="ts">
@@ -83,6 +103,7 @@ type State = {
   showBadInput: boolean
   questionCompleted: boolean
   stats: GameStats
+  lastShownInput: number
 }
 
 type ButtonAction = {
@@ -129,7 +150,8 @@ export default defineComponent({
       showAnswerIncorrect: false,
       showBadInput: false,
       questionCompleted: false,
-      stats: []
+      stats: [],
+      lastShownInput: -1
     };
   },
   computed: {
@@ -261,17 +283,21 @@ export default defineComponent({
 
       this.questionCompleted = true;
     },
-    setShowGiveUpOnQuestion(show: boolean) {
-      this.showGiveUpOnQuestion = show;
-    },
-    setShowBadInput(show: boolean) {
-      this.showBadInput = show;
-    },
     setShowAnswerCorrect(show: boolean) {
       this.showAnswerCorrect = show;
+      this.lastShownInput = 1;
     },
     setShowAnswerIncorrect(show: boolean) {
       this.showAnswerIncorrect = show;
+      this.lastShownInput = 2;
+    },
+    setShowBadInput(show: boolean) {
+      this.showBadInput = show;
+      this.lastShownInput = 3;
+    },
+    setShowGiveUpOnQuestion(show: boolean) {
+      this.showGiveUpOnQuestion = show;
+      this.lastShownInput = 4;
     },
     clearMessageTimer() {
       if (this.messageTimer > 0) {
@@ -283,9 +309,9 @@ export default defineComponent({
     toggleInput(setInput: (value: boolean) => void) {
       setInput(true);
 
-      this.clearMessageTimer();
-
-      this.messageTimer = window.setTimeout(() => setInput(false), 1500);
+      window.setTimeout(() => {
+        setInput(false);
+      }, 1500);
     },
     toggleShowGiveUpOnQuestion() {
       this.toggleInput(this.setShowGiveUpOnQuestion);
@@ -557,10 +583,15 @@ export default defineComponent({
 .message {
   position: relative;
 }
+
 .game-header-left {
   display: flex;
   flex-direction: row;
   align-items: center;
+}
+
+.alert-message-on-top {
+  z-index: 100;
 }
 
 .fade-bubble-enter-from {
