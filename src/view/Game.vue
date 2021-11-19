@@ -95,6 +95,8 @@ type State = {
   showAnswerCorrect: boolean
   showAnswerIncorrect: boolean
   showBadInput: boolean
+  questionCompleted: boolean
+  userAnswer: string[]
 }
 
 type HasTimer = {
@@ -143,6 +145,8 @@ export default defineComponent({
       showAnswerCorrect: false,
       showAnswerIncorrect: false,
       showBadInput: false,
+      questionCompleted: false,
+      userAnswer: []
     };
   },
   computed: {
@@ -187,7 +191,7 @@ export default defineComponent({
     question(): Question {
       return this.questions[this.currentQuestion];
     },
-    // TODO добавить отображение = и ? выводе вопроса
+    // TODO переименовать, questionExpressionTerms
     questionExpression(): ExpressionTerm[] {
       const terms: ExpressionTerm[] = [];
 
@@ -197,15 +201,24 @@ export default defineComponent({
         this.question.terms.forEach((term, i) => {
           const { number, operator } = term;
 
-          if (!this.question.hideIndexes.includes(i)) {
-            terms.push({ term: number.toString(), label: number.toString(), type: 'number' });
-          } else {
-            terms.push({
-              term: ' ',
-              label: ' ',
-              type: 'skip',
-              inputIndex: inputIndex++
-            });
+          if (number) {
+            const numTerm = number.toString();
+
+            if (this.questionCompleted) {
+              const correctAnswer = true;
+
+              if (correctAnswer) {
+                const answerTerm = this.userAnswer[inputIndex++];
+
+                terms.push({ term: answerTerm, label: answerTerm, type: 'number' });
+              } else {
+                terms.push({ term: numTerm, label: numTerm, type: 'number' });
+              }
+            } else if (this.question.hideIndexes.includes(i)) {
+              terms.push({ term: ' ', label: ' ', type: 'skip', inputIndex: inputIndex++ });
+            } else {
+              terms.push({ term: numTerm, label: numTerm, type: 'number' });
+            }
           }
 
           if (operator) {
@@ -219,45 +232,9 @@ export default defineComponent({
       }
 
       return terms;
-    }
-  },
-  mounted() {
-    this.attachTimer();
-
-    this.nextQuestion();
-
-    this.$nextTick(() => this.resetInputState());
-  },
-  unmounted() {
-    this.removeTimer();
-  },
-  methods: {
-    toggleShowBadInput() {
-      this.showBadInput = true;
-
-      setTimeout(() => { this.showBadInput = false; }, 1500);
     },
-    toggleShowAnswerCorrect() {
-      this.showAnswerCorrect = true;
-
-      setTimeout(() => { this.showAnswerCorrect = false; }, 1500);
-    },
-    toggleShowAnswerInсorrect() {
-      this.showAnswerIncorrect = true;
-
-      setTimeout(() => { this.showAnswerIncorrect = false; }, 1500);
-    },
-    validateInput(): boolean {
-      for (const { value } of this.inputs) {
-        if (!value || value === '' || Number.isNaN(+value)) {
-          return false;
-        }
-      }
-
-      return true;
-    },
-    calculateAnswer(): number | null {
-      if (!this.validateInput()) {
+    userAnswerExpression(): string | null {
+      if (!this.validateUserInput()) {
         return null;
       }
 
@@ -273,23 +250,71 @@ export default defineComponent({
         }
       }
 
-      // eslint-disable-next-line no-new-func
-      const calc = new Function(`return ${answerExpression};`);
-
-      return calc();
+      return answerExpression;
     },
-    checkAnswer() {
-      const answer = this.calculateAnswer();
+    userAnswerValue(): number | null {
+      const expr = this.userAnswerExpression;
 
-      if (answer == null) {
-        this.toggleShowBadInput();
-      } else if (answer === this.question.answer) {
-        // TODO добавить сообщение о правильном ответе
-        this.toggleShowAnswerCorrect();
-        // TODO добавить предложение перейти к следующему вопросу
+      if (expr) {
+        // eslint-disable-next-line no-new-func
+        const calc = new Function(`return ${expr};`);
+
+        return calc();
+      }
+
+      return null;
+    },
+    userAswerCorrect(): boolean {
+      return this.userAnswerValue === this.question.answer;
+    }
+  },
+  mounted() {
+    this.attachTimer();
+
+    this.nextQuestion();
+
+    this.$nextTick(() => this.resetInputState());
+  },
+  unmounted() {
+    this.removeTimer();
+  },
+  methods: {
+    completeQuestion() {
+      this.questionCompleted = true;
+    },
+    toggleShowBadInput() {
+      this.showBadInput = true;
+
+      setTimeout(() => { this.showBadInput = false; }, 1500);
+    },
+    toggleShowAnswerCorrect() {
+      this.showAnswerCorrect = true;
+
+      setTimeout(() => { this.showAnswerCorrect = false; }, 1500);
+    },
+    toggleShowAnswerInсorrect() {
+      this.showAnswerIncorrect = true;
+
+      setTimeout(() => { this.showAnswerIncorrect = false; }, 1500);
+    },
+    validateUserInput(): boolean {
+      for (const { value } of this.inputs) {
+        if (!value || value === '' || Number.isNaN(+value)) {
+          return false;
+        }
+      }
+
+      return true;
+    },
+    checkUserAnswer() {
+      if (this.userAnswerValue) {
+        if (this.userAswerCorrect) {
+          this.toggleShowAnswerCorrect();
+        } else {
+          this.toggleShowAnswerInсorrect();
+        }
       } else {
-        this.toggleShowAnswerInсorrect();
-        // TODO добавить стили состояния элементов интерфейса при неправильном ответе
+        this.toggleShowBadInput();
       }
     },
     // TODO переименовать
@@ -351,7 +376,7 @@ export default defineComponent({
       }
 
       if (action.action === '=') {
-        this.checkAnswer();
+        this.checkUserAnswer();
       }
 
       this.focusInput(this.selectedInput);
