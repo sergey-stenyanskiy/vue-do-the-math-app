@@ -1,12 +1,13 @@
 import { createStore, Commit } from 'vuex'
 
-import { State, GameSettingsData } from '../types/types'
+import { State, GameSettingsData, GameStat } from '../types/types'
 
 import defaultSettings from '@/constant'
 
 const INITIAL_STATE: State = {
   previousRoute: '',
-  settings: defaultSettings
+  settings: defaultSettings,
+  stats: []
 }
 
 export default createStore({
@@ -17,6 +18,9 @@ export default createStore({
     },
     setSettings(state: State, settings: GameSettingsData) {
       state.settings = { ...state.settings, ...settings };
+    },
+    addGameStat(state: State, stat: GameStat) {
+      state.stats = [...state.stats, stat];
     }
   },
   actions: {
@@ -25,6 +29,9 @@ export default createStore({
     },
     setSettings({ commit }: {commit: Commit}, settings: GameSettingsData) {
       commit('setSettings', settings);
+    },
+    addGameStat({ commit }: {commit: Commit}, stat: GameStat) {
+      commit('addGameStat', stat);
     }
   },
   modules: {

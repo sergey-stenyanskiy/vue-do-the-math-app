@@ -101,7 +101,6 @@ type State = {
   showAnswerIncorrect: boolean
   showBadInput: boolean
   questionCompleted: boolean
-  stats: GameStats
   lastShownInput: number
 }
 
@@ -148,7 +147,6 @@ export default defineComponent({
       showAnswerIncorrect: false,
       showBadInput: false,
       questionCompleted: false,
-      stats: [],
       lastShownInput: -1
     };
   },
@@ -321,11 +319,11 @@ export default defineComponent({
         value: this.validateUserInput() ? this.userAnswerValue : null
       };
 
-      this.stats.push({
+      this.$store.dispatch('addGameStat', {
         question: this.question!,
         userAnswer,
         userAnswerCorrect: this.userAnswerCorrect
-      })
+      });
     },
     checkUserAnswer() {
       if (this.userAnswerValue) {

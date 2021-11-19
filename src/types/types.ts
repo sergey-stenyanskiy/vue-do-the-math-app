@@ -16,23 +16,9 @@ export type DefaultSettings = {
   operators: ['+', '*']
 }
 
-export type State = {
-  previousRoute: string
-  settings: GameSettings
-}
-
 export type QuestionTerm = {
   number: number
   operator: Operator
-}
-
-export type ExpressionTermType = 'number' | 'operator' | 'equals' | 'answer' | 'skip'
-
-export type ExpressionTerm = {
-  term: string
-  label: string
-  type: ExpressionTermType
-  inputIndex?: number
 }
 
 export type Question = {
@@ -57,3 +43,18 @@ export type GameStat = {
 }
 
 export type GameStats = GameStat[]
+
+export type State = {
+  previousRoute: string
+  settings: GameSettings
+  stats: GameStats
+}
+
+export type ExpressionTermType = 'number' | 'operator' | 'equals' | 'answer' | 'skip'
+
+export type ExpressionTerm = {
+  term: string
+  label: string
+  type: ExpressionTermType
+  inputIndex?: number
+}
