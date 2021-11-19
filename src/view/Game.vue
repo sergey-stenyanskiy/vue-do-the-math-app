@@ -11,7 +11,7 @@
     .timer {{displayedTime}}
   .question-expression.mb-5(v-if="question")
     .expression-term.mr-1(
-      v-for="(term, i) in questionExpression"
+      v-for="(term, i) in questionExpressionTerms"
       :class="`expression-term-${term.type}`"
     )
       input.input-number(
@@ -110,8 +110,7 @@ type State = {
   startTime: Date
   endTime: Date
   currentTime: Date
-  // TODO переименовать, дать более осмысленное имя
-  timer: number
+  gameTimer: number
   messageTimer: number
   inputs: { value: string }[]
   selectedInput: number
@@ -123,16 +122,10 @@ type State = {
   stats: GameStats
 }
 
-type HasTimer = {
-  updateTime: (date: Date) => void
-  timer: ReturnType<typeof setTimeout>
-}
-
 type ButtonAction = {
   action: string
   type: 'digit' | 'blank' | 'action'
 }
-
 
 export default defineComponent({
   name: "Game",
@@ -163,7 +156,7 @@ export default defineComponent({
       startTime,
       endTime,
       currentTime: startTime,
-      timer: -1,
+      gameTimer: -1,
       messageTimer: -1,
       inputs: [],
       selectedInput: -1,
@@ -220,8 +213,7 @@ export default defineComponent({
     question(): Question {
       return this.questions[this.currentQuestion];
     },
-    // TODO переименовать, questionExpressionTerms
-    questionExpression(): ExpressionTerm[] {
+    questionExpressionTerms(): ExpressionTerm[] {
       const terms: ExpressionTerm[] = [];
 
       if (this.question) {
@@ -267,9 +259,7 @@ export default defineComponent({
 
       let answerExpression = "";
 
-      const questionExpression = this.questionExpression;
-
-      for (const term of questionExpression) {
+      for (const term of this.questionExpressionTerms) {
         if (term.inputIndex != null) {
           answerExpression += this.inputs[term.inputIndex].value;
         } else {
@@ -294,14 +284,15 @@ export default defineComponent({
     }
   },
   mounted() {
-    this.attachTimer();
+    this.setGameTimer();
 
     this.nextQuestion();
 
     this.$nextTick(() => this.resetInputState());
   },
   unmounted() {
-    this.removeTimer();
+    this.clearGameTimer();
+    this.clearMessageTimer();
   },
   methods: {
     completeQuestion() {
@@ -319,7 +310,7 @@ export default defineComponent({
     setShowAnswerIncorrect(show: boolean) {
       this.showAnswerIncorrect = show;
     },
-    resetMessageTimer() {
+    clearMessageTimer() {
       if (this.messageTimer > 0) {
         window.clearTimeout(this.messageTimer);
 
@@ -329,7 +320,7 @@ export default defineComponent({
     toggleInput(setInput: (value: boolean) => void) {
       setInput(true);
 
-      this.resetMessageTimer();
+      this.clearMessageTimer();
 
       this.messageTimer = window.setTimeout(() => setInput(false), 1500);
     },
@@ -377,24 +368,22 @@ export default defineComponent({
         this.toggleShowBadInput();
       }
     },
-    // TODO переименовать
-    attachTimer() {
+    setGameTimer() {
       const it = this;
 
-      this.timer = window.setTimeout((function timerfun(this: typeof it) {
+      this.gameTimer = window.setTimeout((function timerfun(this: typeof it) {
         const time = new Date();
 
         this.updateTime(time);
 
-        this.timer = window.setTimeout(timerfun.bind(this), 1000);
+        this.gameTimer = window.setTimeout(timerfun.bind(this), 1000);
       }).bind(this), 0);
     },
-    // TODO переименовать
-    removeTimer() {
-      if (this.timer > 0) {
-        window.clearTimeout(this.timer);
+    clearGameTimer() {
+      if (this.gameTimer > 0) {
+        window.clearTimeout(this.gameTimer);
 
-        this.timer = -1;
+        this.gameTimer = -1;
       }
     },
     updateTime(time: Date) {
@@ -410,10 +399,9 @@ export default defineComponent({
     setSelectedInput(index: number) {
       this.selectedInput = Math.max(0, Math.min(this.inputs.length - 1, index));
 
-      this.focusInput(this.selectedInput);
+      this.focusUserInput(this.selectedInput);
     },
-    // TODO дать более осмысленное имя
-    focusInput(index: number) {
+    focusUserInput(index: number) {
       const input = this.$refs[`input${index}`] as HTMLInputElement;
 
       if (input) {
@@ -424,7 +412,7 @@ export default defineComponent({
       if (!this.questionCompleted) {
         this.handleAction(action);
 
-        this.focusInput(this.selectedInput);
+        this.focusUserInput(this.selectedInput);
       }
     },
     handleAction(action: ButtonAction) {
@@ -472,7 +460,7 @@ export default defineComponent({
 
       this.selectedInput = 0;
 
-      this.focusInput(0);
+      this.focusUserInput(0);
     },
     // TODO сделать функцию генерации вопроса независимой от компонента, необходимые параметры
     // генерации передавать в аргументах
