@@ -94,7 +94,6 @@ type State = {
   endTime: Date
   currentTime: Date
   gameTimer: number
-  messageTimer: number
   inputs: { value: string }[]
   selectedInput: number
   showGiveUpOnQuestion: boolean
@@ -142,7 +141,6 @@ export default defineComponent({
       endTime,
       currentTime: startTime,
       gameTimer: -1,
-      messageTimer: -1,
       inputs: [],
       selectedInput: -1,
       showGiveUpOnQuestion: false,
@@ -275,7 +273,6 @@ export default defineComponent({
   },
   unmounted() {
     this.clearGameTimer();
-    this.clearMessageTimer();
   },
   methods: {
     completeQuestion() {
@@ -298,13 +295,6 @@ export default defineComponent({
     setShowGiveUpOnQuestion(show: boolean) {
       this.showGiveUpOnQuestion = show;
       this.lastShownInput = 4;
-    },
-    clearMessageTimer() {
-      if (this.messageTimer > 0) {
-        window.clearTimeout(this.messageTimer);
-
-        this.messageTimer = -1;
-      }
     },
     toggleInput(setInput: (value: boolean) => void) {
       setInput(true);
