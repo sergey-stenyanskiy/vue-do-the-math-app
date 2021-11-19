@@ -74,6 +74,12 @@ teleport(to="body")
         v-if="showGiveUpOnQuestion"
         :class="{ 'alert-message-on-top': lastShownInput === 4 }"
       )
+Modal(:show="showEndGameScreen"
+  @dialog-action="handleEndGameScreenAction"
+)
+  template(v-slot:title) Конец игры
+  template(v-slot:content)
+    | Игра окончена. Ниже приведена статистика игровой сессии:
 </template>
 
 <script lang="ts">
@@ -85,6 +91,7 @@ import { generateQuestion } from '../util/util'
 
 import SvgIcon from '../component/SvgIcon.vue'
 import AlertMessage from '../component/AlertMessage.vue'
+import Modal from '../component/Modal.vue'
 import RoundButton from '../component/RoundButton.vue'
 
 type State = {
@@ -97,11 +104,13 @@ type State = {
   inputs: { value: string }[]
   selectedInput: number
   showGiveUpOnQuestion: boolean
+  showEndGameScreen: boolean
   showAnswerCorrect: boolean
   showAnswerIncorrect: boolean
   showBadInput: boolean
   questionCompleted: boolean
   lastShownInput: number
+  gameEnded: boolean
 }
 
 type ButtonAction = {
@@ -114,7 +123,8 @@ export default defineComponent({
   components: {
     RoundButton,
     SvgIcon,
-    AlertMessage
+    AlertMessage,
+    Modal
   },
   beforeRouteLeave(
     from,
@@ -131,7 +141,8 @@ export default defineComponent({
     const startTime = new Date();
 
     const endTime = new Date(startTime.getTime());
-    endTime.setMinutes(endTime.getMinutes() + timeConstraint);
+    // endTime.setMinutes(endTime.getMinutes() + timeConstraint);
+    endTime.setSeconds(endTime.getSeconds() + 5);
 
     return {
       question: null,
@@ -145,20 +156,29 @@ export default defineComponent({
       showGiveUpOnQuestion: false,
       showAnswerCorrect: false,
       showAnswerIncorrect: false,
+      showEndGameScreen: false,
       showBadInput: false,
       questionCompleted: false,
-      lastShownInput: -1
+      lastShownInput: -1,
+      gameEnded: false
     };
   },
   computed: {
     timeLeft(): Date {
       return new Date(this.endTime.getTime() - this.currentTime.getTime());
     },
+    timeRunOut(): boolean {
+      return this.timeLeft.getTime() <= 0;
+    },
     displayedTime(): string {
-      const minutes = this.timeLeft.getMinutes();
-      const seconds = this.timeLeft.getSeconds();
+      if (!this.gameEnded) {
+        const minutes = this.timeLeft.getMinutes();
+        const seconds = this.timeLeft.getSeconds();
 
-      return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
+        return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
+      }
+
+      return '0:00';
     },
     buttonActions(): ButtonAction[] {
       return [
@@ -264,10 +284,18 @@ export default defineComponent({
     this.clearGameTimer();
   },
   methods: {
+    handleEndGameScreenAction(action: string) {
+      if (action === 'ok') {
+        this.goBack();
+      }
+    },
     completeQuestion() {
       this.addStat();
 
       this.questionCompleted = true;
+    },
+    setShowEndGameScreen(show: boolean) {
+      this.showEndGameScreen = show;
     },
     setShowAnswerCorrect(show: boolean) {
       this.showAnswerCorrect = show;
@@ -358,6 +386,13 @@ export default defineComponent({
     },
     updateTime(time: Date) {
       this.currentTime = new Date(time.getTime());
+
+      if (this.timeRunOut && !this.gameEnded) {
+        this.completeQuestion();
+        this.setShowEndGameScreen(true);
+
+        this.gameEnded = true;
+      }
     },
     goBack() {
       if (this.$store.state.previousRoute !== '') {
