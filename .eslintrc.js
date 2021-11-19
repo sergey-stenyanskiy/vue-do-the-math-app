@@ -43,6 +43,7 @@ module.exports = {
     'vue/multi-word-component-names': 'off',
     '@typescript-eslint/ban-ts-comment': 'off',
     'prefer-destructuring': 'off',
-    'no-restricted-syntax': 'off'
+    'no-restricted-syntax': 'off',
+    "@typescript-eslint/no-this-alias": "off"
   },
 };
