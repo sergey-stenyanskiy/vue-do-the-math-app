@@ -182,12 +182,6 @@ export default defineComponent({
         { action: '=', type: 'action' },
       ];
     },
-    digits(): number[] {
-      return [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
-    },
-    actions(): string[] {
-      return ['<', '>', '?', '='];
-    },
     settings(): GameSettings {
       return this.$store.state.settings;
     },
@@ -537,17 +531,6 @@ export default defineComponent({
   flex-direction: row;
   justify-content: center;
   align-items: center;
-}
-
-.digits {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-evenly;
-}
-
-.actions {
-  display: flex;
-  flex-direction: column;
 }
 
 .question-expression {
