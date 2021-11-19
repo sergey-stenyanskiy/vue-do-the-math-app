@@ -44,7 +44,6 @@
             :disabled="questionCompleted"
           )
             template(v-slot:child) {{action.action}}
-button(@click="nextQuestion") Next
 teleport(to="body")
   .message
     transition(name="fade-bubble")
@@ -652,6 +651,8 @@ export default defineComponent({
 .expression-term-number {
   color: black;
   font-weight: 700;
+  border-bottom: 1px solid transparent;
+  padding: 4px;
 }
 
 .message {
