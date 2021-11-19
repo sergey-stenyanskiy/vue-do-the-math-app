@@ -1,9 +1,13 @@
 <template lang="pug">
 .game
   .game-header.mb-5
-    button.back-button(type="button" @click="goBack")
-      SvgIcon.mr-1(name="cross")
-      span Отмена
+    .game-header-left
+      button.button(type="button" @click="goBack")
+        SvgIcon.mr-1(name="cross")
+        span Отмена
+      .mr-1
+      button.button(type="button" @click="nextQuestion" v-if="questionCompleted")
+        span Следующий вопрос
     .timer {{displayedTime}}
   .question-expression.mb-5(v-if="question")
     .expression-term.mr-1(
@@ -553,7 +557,7 @@ export default defineComponent({
   width: 100%;
 }
 
-.back-button {
+.button {
   outline: none;
   text-transform: uppercase;
   margin: 0;
@@ -686,6 +690,12 @@ export default defineComponent({
   border: 1px solid #C62828;
   color: #C62828;
   background: #FFEBEE;
+}
+
+.game-header-left {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 
 .fade-bubble-enter-from {
