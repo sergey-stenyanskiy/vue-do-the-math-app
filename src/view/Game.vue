@@ -393,8 +393,14 @@ export default defineComponent({
         input.focus();
       }
     },
-    // TODO вынести логику обработки действия в отдельный метод
     handleActionClick(action: ButtonAction) {
+      if (!this.questionCompleted) {
+        this.handleAction(action);
+
+        this.focusInput(this.selectedInput);
+      }
+    },
+    handleAction(action: ButtonAction) {
       if (action.action === '>') {
         this.setSelectedInput(this.selectedInput + 1);
       }
@@ -414,8 +420,6 @@ export default defineComponent({
       if (action.action === '?') {
         this.completeQuestion();
       }
-
-      this.focusInput(this.selectedInput);
     },
     nextQuestion() {
       const question = this.generateNextQuestion();
