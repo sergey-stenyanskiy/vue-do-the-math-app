@@ -1,6 +1,6 @@
 import { defineComponent } from 'vue'
 
-import { GameSession } from '@/types/types';
+import { GameSession, GameSessionRate } from '@/types/types';
 
 export default defineComponent({
   computed: {
@@ -21,6 +21,18 @@ export default defineComponent({
     },
     correctAnswerRate(): number {
       return Math.floor((this.correctAnswers / this.totalAnswers) * 100);
-    }
+    },
+    overtimeRate(): GameSessionRate {
+      return this.$store.getters.overtimeRate;
+    },
+    overtimeCorrectAnswers(): number {
+      return this.overtimeRate.correct;
+    },
+    overtimeTotalAnswers(): number {
+      return this.overtimeRate.total;
+    },
+    overtimeCorrectAnswersRate(): number {
+      return Math.floor((this.overtimeCorrectAnswers / this.overtimeTotalAnswers) * 100);
+    },
   }
 })

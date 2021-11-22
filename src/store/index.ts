@@ -123,6 +123,27 @@ export default createStore({
         return state.stats.sessions.find((session) => session.id === id) ?? null;
       }
     },
+    overtimeRate(state: State): GameSessionRate {
+      const result: GameSessionRate = {
+        correct: 0,
+        incorrect: 0,
+        total: 0
+      };
+
+      state.stats.sessions.forEach((session) => {
+        session.stats.forEach((stat) => {
+          if (stat.userAnswerCorrect) {
+            result.correct++;
+          } else {
+            result.incorrect++;
+          }
+
+          result.total++;
+        });
+      });
+
+      return result;
+    },
     consecutiveDays(state: State, getters: Getters): number {
       let lastSessionTime: Date | null = null;
       let result = 0;
