@@ -6,7 +6,7 @@
         SvgIcon.mr-1(name="cross")
         span Отмена
       .mr-1
-      button.button(type="button" @click="nextQuestion" v-if="questionCompleted")
+      button.button(type="button" @click="nextQuestion" v-if="questionCompleted && !gameEnded")
         span Следующий вопрос
     .timer {{displayedTime}}
   .question-expression.mb-5(v-if="question")
