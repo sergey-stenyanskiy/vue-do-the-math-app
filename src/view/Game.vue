@@ -2,7 +2,7 @@
 .game
   .game-header.mb-5
     .game-header-left
-      button.button(type="button" @click="goBack")
+      button.button(type="button" @click="endGameSession")
         SvgIcon.mr-1(name="cross")
         span Отмена
       .mr-1
@@ -83,6 +83,8 @@ Modal(:show="showEndGameScreen"
 </template>
 
 <script lang="ts">
+// TODO поправить стили членов выражения при выводе
+
 import { defineComponent } from 'vue'
 
 import { GameSettings, Question, UserAnswer, GameStats, ExpressionTerm } from '../types/types'
@@ -141,8 +143,7 @@ export default defineComponent({
     const startTime = new Date();
 
     const endTime = new Date(startTime.getTime());
-    // endTime.setMinutes(endTime.getMinutes() + timeConstraint);
-    endTime.setSeconds(endTime.getSeconds() + 5);
+    endTime.setMinutes(endTime.getMinutes() + timeConstraint);
 
     return {
       question: null,
@@ -216,6 +217,8 @@ export default defineComponent({
             const numTerm = number.toString();
 
             if (this.questionCompleted) {
+              // TODO добавить дополнительную проверку && this.question?.hideIndexes.includes(i) для
+              // избежания ошибок при рендере
               if (this.userAnswerCorrect) {
                 const answerTerm = this.inputs[inputIndex++].value;
 
@@ -274,6 +277,8 @@ export default defineComponent({
     }
   },
   mounted() {
+    this.$store.dispatch('startGameSession');
+
     this.setGameTimer();
 
     this.nextQuestion();
@@ -384,14 +389,19 @@ export default defineComponent({
         this.gameTimer = -1;
       }
     },
+    endGameSession() {
+      this.completeQuestion();
+      this.setShowEndGameScreen(true);
+
+      this.gameEnded = true;
+
+      this.$store.dispatch('endGameSession');
+    },
     updateTime(time: Date) {
       this.currentTime = new Date(time.getTime());
 
       if (this.timeRunOut && !this.gameEnded) {
-        this.completeQuestion();
-        this.setShowEndGameScreen(true);
-
-        this.gameEnded = true;
+        this.endGameSession();
       }
     },
     goBack() {
