@@ -23,10 +23,10 @@
         @focus="selectedInput = term.inputIndex, $event.currentTarget.select()"
       )
       span(v-else) {{term.label}}
-    .expression-term.expression-equals =
+    .expression-term.expression-equals.mb-1 =
     .mr-1
-    .expression-term.expression-answer {{question.answer}}
-    span.question-mark(v-if="!questionCompleted") ?
+    .expression-term.expression-answer.mb-1 {{question.answer}}
+    span.question-mark.mb-1(v-if="!questionCompleted") ?
   .controls
     .control-item(v-for="action in buttonActions")
       .digit(v-if="action.type === 'digit'")
@@ -584,6 +584,8 @@ export default defineComponent({
 
 .expression-term, .question-mark {
   color: #c0c0c0;
+  padding: 4px;
+  border: 1px solid transparent;
 }
 
 .expression-term-number {
