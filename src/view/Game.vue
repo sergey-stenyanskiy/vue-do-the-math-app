@@ -300,9 +300,10 @@ export default defineComponent({
       }
     },
     completeQuestion() {
-      this.addStat();
-
-      this.questionCompleted = true;
+      if (!this.questionCompleted) {
+        this.addStat();
+        this.questionCompleted = true;
+      }
     },
     setShowEndGameScreen(show: boolean) {
       this.showEndGameScreen = show;
@@ -395,12 +396,13 @@ export default defineComponent({
       }
     },
     endGameSession() {
-      this.completeQuestion();
-      this.setShowEndGameScreen(true);
+      if (!this.gameEnded) {
+        this.completeQuestion();
+        this.setShowEndGameScreen(true);
 
-      this.gameEnded = true;
-
-      this.$store.dispatch('endGameSession');
+        this.gameEnded = true;
+        this.$store.dispatch('endGameSession');
+      }
     },
     updateTime(time: Date) {
       this.currentTime = new Date(time.getTime());
