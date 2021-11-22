@@ -83,8 +83,6 @@ Modal(:show="showEndGameScreen"
 </template>
 
 <script lang="ts">
-// TODO поправить стили членов выражения при выводе
-
 import { defineComponent } from 'vue'
 
 import { GameSettings, Question, UserAnswer, GameStats, ExpressionTerm } from '../types/types'
@@ -580,6 +578,7 @@ export default defineComponent({
   flex-wrap: wrap;
 
   font-size: 1.18em;
+  line-height: 2em;
 }
 
 .expression-term, .question-mark {
