@@ -1,14 +1,16 @@
 <template lang="pug">
 .stats-message
-  span Добро пожаловать на {{consecutiveDays}} тренировочный день.
-  span Ваш последний результат - решено {{correctAnswers}} из {{totalAnswers}}
-  span Общая точность: {{correctAnswerRate}}%
+  span Добро пожаловать на {{consecutiveDays}} тренировочный день.&nbsp;
+  .notice(v-if="lastSession")
+    span Ваш последний результат - решено {{correctAnswers}} из {{totalAnswers}}.&nbsp;
+    span Общая точность: {{correctAnswerRate}}%.&nbsp;
+  .no-stats(v-else) Нет данных по прошлым игровым сессиям.
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
 
-import { GameStat } from '../types/types'
+import { GameSession } from '../types/types'
 
 export default defineComponent({
   name: 'StatsMessage',
@@ -17,19 +19,19 @@ export default defineComponent({
       return this.$store.state.stats;
     },
     consecutiveDays(): number {
-      return 10;
+      return this.$store.getters.consecutiveDays === 0 ? 'первый' : this.$store.getters.consecutiveDays;
     },
-    lastSessionStat(): GameStat | null {
-      return this.stats[this.stats.length - 1];
+    lastSession(): GameSession | null {
+      return this.$store.getters.lastSession;
     },
     correctAnswers(): number {
-      return 10;
+      return this.lastSession?.rate.correct ?? 0;
     },
     totalAnswers(): number {
-      return 10;
+      return this.lastSession?.rate.total ?? 0;
     },
     correctAnswerRate(): number {
-      return Math.floor(this.correctAnswers / this.totalAnswers) * 100;
+      return Math.floor((this.correctAnswers / this.totalAnswers) * 100);
     }
   }
 })
