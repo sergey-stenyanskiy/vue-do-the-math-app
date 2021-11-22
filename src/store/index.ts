@@ -1,17 +1,29 @@
 import { createStore, Commit, Getter, GetterTree } from 'vuex'
 
-import { State, GameSettingsData, GameStat, GameSession, GameSessionData, GameSessionRate } from '../types/types'
+import { State, GameSettingsData, GameStat, GameSession, GameSessionData, GameSessionRate, OvertimeStats } from '../types/types'
 
 import uuid from '../util/uuid'
 
 import defaultSettings from '@/constant'
 
+function dumpStats(stats: OvertimeStats) {
+  if (!stats.sessions || stats.sessions.length === 0) {
+    localStorage.removeItem('stats');
+  } else {
+    localStorage.setItem('stats', JSON.stringify(stats));
+  }
+}
+
+const EMPTY_STATS = {
+  sessions: []
+};
+
+const initialStats = JSON.parse(localStorage.getItem('stats') ?? 'null') ?? EMPTY_STATS;
+
 const INITIAL_STATE: State = {
   previousRoute: '',
   settings: defaultSettings,
-  stats: {
-    sessions: []
-  }
+  stats: initialStats
 }
 
 type SetGameSessionPayload = {
@@ -47,6 +59,8 @@ export default createStore({
       }
 
       currentSession.rate.total++;
+
+      dumpStats(state.stats);
     },
     startGameSession(state: State) {
       state.stats.sessions.push({
@@ -61,6 +75,8 @@ export default createStore({
           incorrect: 0,
         }
       });
+
+      dumpStats(state.stats);
     },
     setGameSession(state: State, { id, data } : SetGameSessionPayload) {
       state.stats.sessions = state.stats.sessions.map((session, i) => {
@@ -73,6 +89,8 @@ export default createStore({
 
         return session;
       });
+
+      dumpStats(state.stats);
     },
     endGameSession() {}
   },
