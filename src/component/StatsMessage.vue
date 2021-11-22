@@ -2,8 +2,9 @@
 .stats-message
   span Добро пожаловать на {{consecutiveDays}} тренировочный день.&nbsp;
   .notice(v-if="lastSession")
-    span Ваш последний результат - решено {{correctAnswers}} из {{totalAnswers}}.&nbsp;
-    span Общая точность: {{correctAnswerRate}}%.&nbsp;
+    span Ваш последний результат - решено {{correctAnswers}} из {{totalAnswers}}.
+    .mb-1
+    span Общая точность: {{overtimeCorrectAnswersRate}}%.&nbsp;
   .no-stats(v-else) Нет данных по прошлым игровым сессиям.
 </template>
 
