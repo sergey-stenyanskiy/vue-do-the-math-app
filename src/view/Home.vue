@@ -1,4 +1,5 @@
 <template lang="pug">
+StatsMessage
 SettingsForm
 </template>
 
@@ -7,12 +8,14 @@ import { defineComponent } from 'vue'
 
 import { GameSettings } from '@/types/types';
 
+import StatsMessage from '../component/StatsMessage.vue'
 import SettingsForm from '../component/SettingsForm.vue'
 
 export default defineComponent({
   name: 'Home',
   components: {
-    SettingsForm
+    SettingsForm,
+    StatsMessage
   },
   beforeRouteLeave(
     from,
