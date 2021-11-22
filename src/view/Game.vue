@@ -80,6 +80,12 @@ Modal(:show="showEndGameScreen"
   template(v-slot:title) Конец игры
   template(v-slot:content)
     | Игра окончена. Ниже приведена статистика игровой сессии:
+    .mb-1
+    | Всего вопросов: {{totalAnswers}}
+    br
+    | Правильных ответов: {{correctAnswers}}
+    br
+    | Общий процент правильных ответов: {{correctAnswerRate}}
 </template>
 
 <script lang="ts">
@@ -88,6 +94,8 @@ import { defineComponent } from 'vue'
 import { GameSettings, Question, UserAnswer, GameStats, ExpressionTerm } from '../types/types'
 
 import { generateQuestion } from '../util/util'
+
+import gameStatsMixin from '../mixin/gameStatsMixin'
 
 import SvgIcon from '../component/SvgIcon.vue'
 import AlertMessage from '../component/AlertMessage.vue'
@@ -126,6 +134,7 @@ export default defineComponent({
     AlertMessage,
     Modal
   },
+  mixins: [gameStatsMixin],
   beforeRouteLeave(
     from,
     to,
