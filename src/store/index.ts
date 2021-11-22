@@ -2,6 +2,7 @@ import { createStore, Commit, Getter, GetterTree } from 'vuex'
 
 import { State, GameSettingsData, GameStat, GameSession, GameSessionData, GameSessionRate } from '../types/types'
 
+import uuid from '../util/uuid'
 
 import defaultSettings from '@/constant'
 
@@ -49,8 +50,7 @@ export default createStore({
     },
     startGameSession(state: State) {
       state.stats.sessions.push({
-        // TODO добавить nanoid для генерации идентификатора сессии
-        id: 'example',
+        id: uuid(),
         stats: [],
         start: new Date(),
         end: null,
