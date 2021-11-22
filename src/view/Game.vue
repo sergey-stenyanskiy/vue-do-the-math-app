@@ -217,9 +217,7 @@ export default defineComponent({
             const numTerm = number.toString();
 
             if (this.questionCompleted) {
-              // TODO добавить дополнительную проверку && this.question?.hideIndexes.includes(i) для
-              // избежания ошибок при рендере
-              if (this.userAnswerCorrect) {
+              if (this.userAnswerCorrect && this.question?.hideIndexes.includes(i)) {
                 const answerTerm = this.inputs[inputIndex++].value;
 
                 terms.push({ term: answerTerm, label: answerTerm, type: 'number' });
