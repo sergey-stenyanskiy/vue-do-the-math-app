@@ -8,7 +8,9 @@
       .mr-1
       button.button(type="button" @click="nextQuestion" v-if="questionCompleted && !gameEnded")
         span Следующий вопрос
-    .timer {{displayedTime}}
+    .timer
+      .timer-progress-bar(:style="{ width: progressBarWidth }")
+      | {{displayedTime}}
   .question-expression.mb-5(v-if="question")
     .expression-term.mr-1.mb-1(
       v-for="(term, i) in questionExpressionTerms"
@@ -126,6 +128,10 @@ type ButtonAction = {
   type: 'digit' | 'blank' | 'action'
 }
 
+const TIMER_WIDTH = 85;
+const TIMER_PADDING = 4;
+const TIMER_TOTAL_WIDTH = TIMER_WIDTH + 2 * TIMER_PADDING;
+
 export default defineComponent({
   name: 'Game',
   components: {
@@ -172,6 +178,15 @@ export default defineComponent({
     };
   },
   computed: {
+    progressBarWidth() {
+      const totalTime = this.endTime.getTime() - this.startTime.getTime();
+
+      const timeLeft = this.timeLeft.getTime();
+
+      const progress = timeLeft / totalTime;
+
+      return `${progress * TIMER_TOTAL_WIDTH}px`;
+    },
     correctAnswers() {
       return this.statsCalculator.correctAnswers;
     },
@@ -545,10 +560,24 @@ export default defineComponent({
   align-items: center;
   justify-content: flex-end;
   background: #FAFAFA;
-  color: #78909C;
-  width: 75px;
+  background: transparent;
+  color: black;
+  width: 85px;
   padding: 4px;
   border: 1px solid #C5CAE9;
+  position: relative;
+
+}
+
+.timer-progress-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+
+  background: #9FA8DA;
+  z-index: -1;
 }
 
 .input-number {
