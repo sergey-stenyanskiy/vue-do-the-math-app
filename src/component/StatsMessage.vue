@@ -11,11 +11,30 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 
-import gameStatsMixin from '../mixin/gameStatsMixin'
+import gameStatsMixin from '../mixin/statsCalculatorMixin'
 
 export default defineComponent({
   name: 'StatsMessage',
-  mixins: [gameStatsMixin]
+  mixins: [gameStatsMixin],
+  computed: {
+    consecutiveDays(): string {
+      const days = this.statsCalculator.consecutiveDays();
+
+      return days === 0 ? 'первый' : days.toString();
+    },
+    lastSession() {
+      return this.statsCalculator.lastSession();
+    },
+    correctAnswers() {
+      return this.statsCalculator.correctAnswers();
+    },
+    totalAnswers() {
+      return this.statsCalculator.totalAnswers();
+    },
+    overtimeCorrectAnswersRate() {
+      return this.statsCalculator.overtimeCorrectAnswersRate();
+    },
+  }
 })
 </script>
 

@@ -95,7 +95,7 @@ import { GameSettings, Question, UserAnswer, GameStats, ExpressionTerm } from '.
 
 import { generateQuestion } from '../util/util'
 
-import gameStatsMixin from '../mixin/gameStatsMixin'
+import gameStatsMixin from '../mixin/statsCalculatorMixin'
 
 import SvgIcon from '../component/SvgIcon.vue'
 import AlertMessage from '../component/AlertMessage.vue'
@@ -172,6 +172,15 @@ export default defineComponent({
     };
   },
   computed: {
+    correctAnswers() {
+      return this.statsCalculator.correctAnswers();
+    },
+    totalAnswers() {
+      return this.statsCalculator.totalAnswers();
+    },
+    correctAnswerRate() {
+      return this.statsCalculator.correctAnswerRate();
+    },
     timeLeft(): Date {
       return new Date(this.endTime.getTime() - this.currentTime.getTime());
     },

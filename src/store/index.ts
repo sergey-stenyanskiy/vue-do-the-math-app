@@ -141,49 +141,6 @@ export default createStore({
         return state.stats.sessions.find((session) => session.id === id) ?? null;
       }
     },
-    overtimeRate(state: State): GameSessionRate {
-      const result: GameSessionRate = {
-        correct: 0,
-        incorrect: 0,
-        total: 0
-      };
-
-      state.stats.sessions.forEach((session) => {
-        session.stats.forEach((stat) => {
-          if (stat.userAnswerCorrect) {
-            result.correct++;
-          } else {
-            result.incorrect++;
-          }
-
-          result.total++;
-        });
-      });
-
-      return result;
-    },
-    consecutiveDays(state: State): number {
-      let lastSessionTime: Date | null = null;
-      let result = 0;
-
-      for (let i = state.stats.sessions.length - 1; i >= 0; i--) {
-        const session = state.stats.sessions[i];
-
-        if (!session) return 0;
-
-        if (session.end != null && lastSessionTime != null) {
-          if (lastSessionTime.getDay() - session.end.getDay() < 2) {
-            result++;
-
-            lastSessionTime = session.end;
-          } else {
-            return 0;
-          }
-        }
-      }
-
-      return result;
-    }
   },
   modules: {
   }
