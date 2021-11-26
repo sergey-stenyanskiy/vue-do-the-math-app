@@ -60,9 +60,11 @@ export default class GameStatsCalculator {
       const session = this.stats.sessions[i];
 
       if (lastSessionTime != null) {
-        if (lastSessionTime.getDay() - session.start.getDay() < 2) {
+        const dayDifference = lastSessionTime.getDay() - session.start.getDay();
+
+        if (dayDifference === 1) {
           result++;
-        } else {
+        } else if (dayDifference > 1) {
           return 0;
         }
       }
