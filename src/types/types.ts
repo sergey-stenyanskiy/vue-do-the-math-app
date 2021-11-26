@@ -3,6 +3,10 @@ export type Operators = ['+', '-', '*', '/', '**']
 export type Operator = Operators[number]
 
 export type GameSettings = {
+  minDifficulty: number,
+  maxDifficulty: number,
+  minTimeConstraint: number,
+  maxTimeConstraint: number,
   timeConstraint: number
   difficulty: number
   operators: Operator[]
@@ -11,6 +15,10 @@ export type GameSettings = {
 export type GameSettingsData = Partial<GameSettings>
 
 export type DefaultSettings = {
+  minDifficulty: 1,
+  maxDifficulty: 5,
+  minTimeConstraint: 1,
+  maxTimeConstraint: 10,
   timeConstraint: 5
   difficulty: 3
   operators: ['+', '*']

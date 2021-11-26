@@ -1,10 +1,21 @@
 <template lang="pug">
 form#settings-form(@submit.prevent="handleSubmit")
   h4 Настройки
-  input#settings-time-constraint(type="range" min="1" max="10" step="1" v-model="timeConstraint")
+  input#settings-time-constraint(
+    type="range"
+    :min="settings.minTimeConstraint"
+    :max="settings.maxTimeConstraint"
+    step="1" v-model="timeConstraint"
+  )
   label(for="time-constraint") Длительность: {{timeConstraint}} минут
   .mb-2
-  input#settings-difficulty(type="range" min="1" max="5" step="1" v-model="difficulty")
+  input#settings-difficulty(
+    type="range"
+    :min="settings.minDifficulty"
+    :max="settings.maxDifficulty"
+    step="1"
+    v-model="difficulty"
+  )
   label(for="difficulty") Сложность: {{difficulty}}
   .mb-2
   .operators
@@ -64,6 +75,9 @@ export default defineComponent({
   computed: {
     operatorOptions(): OperatorOption[] {
       return OPERATOR_OPTIONS;
+    },
+    settings(): GameSettings {
+      return this.$store.state.settings;
     }
   },
   methods: {
