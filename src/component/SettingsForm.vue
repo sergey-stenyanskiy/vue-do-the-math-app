@@ -7,7 +7,7 @@ form#settings-form(@submit.prevent="handleSubmit")
     :max="settings.maxTimeConstraint"
     step="1" v-model="timeConstraint"
   )
-  label(for="time-constraint") Длительность: {{timeConstraint}} минут
+  label(for="time-constraint") Длительность: {{timeConstraint}} {{minutesInflection(timeConstraint)}}
   .mb-2
   input#settings-difficulty(
     type="range"
@@ -81,6 +81,22 @@ export default defineComponent({
     }
   },
   methods: {
+    minutesInflection(numMinutes: number): string {
+      const lastTwoDigits = numMinutes % 100;
+
+      if (lastTwoDigits >= 11 && lastTwoDigits <= 19) {
+        return 'минут';
+      }
+
+      const lastDigit = numMinutes % 10;
+
+      switch (lastDigit) {
+        case 0: case 5: case 6: case 7: case 8: case 9: return 'минут';
+        case 1: return 'минута';
+        case 2: case 3: case 4: return 'минуты';
+        default: return 'минут'
+      }
+    },
     handleSubmit() {
       this.$store.dispatch('setSettings', {
         timeConstraint: +this.timeConstraint,
