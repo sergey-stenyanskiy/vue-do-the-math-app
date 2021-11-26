@@ -8,7 +8,7 @@ export default class GameStatsCalculator {
     this.stats = stats;
   }
 
-  lastSession(): GameSession | null {
+  get lastSession(): GameSession | null {
     return this.sessionFromLast(0);
   }
 
@@ -16,8 +16,8 @@ export default class GameStatsCalculator {
     return this.stats.sessions[this.stats.sessions.length - 1 - number] ?? null;
   }
 
-  currentSession(): GameSession | null {
-    const last = this.lastSession();
+  get currentSession(): GameSession | null {
+    const last = this.lastSession;
 
     return last && last.status === 'ongoing' ? last : null;
   }
@@ -26,7 +26,7 @@ export default class GameStatsCalculator {
     return this.stats.sessions.find((session) => session.id === id) ?? null;
   }
 
-  overtimeRate(): GameSessionRate {
+  get overtimeRate(): GameSessionRate {
     const result: GameSessionRate = {
       correct: 0,
       incorrect: 0,
@@ -48,7 +48,7 @@ export default class GameStatsCalculator {
     return result;
   }
 
-  consecutiveDays(): number {
+  get consecutiveDays(): number {
     let lastSessionTime: Date | null = null;
     let result = 0;
 
@@ -73,27 +73,27 @@ export default class GameStatsCalculator {
     return result;
   }
 
-  correctAnswers(): number {
-    return this.lastSession()?.rate.correct ?? 0;
+  get correctAnswers(): number {
+    return this.lastSession?.rate.correct ?? 0;
   }
 
-  totalAnswers(): number {
-    return this.lastSession()?.rate.total ?? 0;
+  get totalAnswers(): number {
+    return this.lastSession?.rate.total ?? 0;
   }
 
-  correctAnswerRate(): number {
-    return Math.floor((this.correctAnswers() / this.totalAnswers()) * 100);
+  get correctAnswerRate(): number {
+    return Math.floor((this.correctAnswers / this.totalAnswers) * 100);
   }
 
-  overtimeCorrectAnswers(): number {
-    return this.overtimeRate().correct;
+  get overtimeCorrectAnswers(): number {
+    return this.overtimeRate.correct;
   }
 
-  overtimeTotalAnswers(): number {
-    return this.overtimeRate().total;
+  get overtimeTotalAnswers(): number {
+    return this.overtimeRate.total;
   }
 
-  overtimeCorrectAnswersRate(): number {
-    return Math.floor((this.overtimeCorrectAnswers() / this.overtimeTotalAnswers()) * 100);
+  get overtimeCorrectAnswersRate(): number {
+    return Math.floor((this.overtimeCorrectAnswers / this.overtimeTotalAnswers) * 100);
   }
 }

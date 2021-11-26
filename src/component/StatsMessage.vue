@@ -18,21 +18,21 @@ export default defineComponent({
   mixins: [gameStatsMixin],
   computed: {
     consecutiveDays(): string {
-      const days = this.statsCalculator.consecutiveDays();
+      const days = this.statsCalculator.consecutiveDays;
 
       return days === 0 ? 'первый' : days.toString();
     },
     lastSession() {
-      return this.statsCalculator.lastSession();
+      return this.statsCalculator.lastSession;
     },
     correctAnswers() {
-      return this.statsCalculator.correctAnswers();
+      return this.statsCalculator.correctAnswers;
     },
     totalAnswers() {
-      return this.statsCalculator.totalAnswers();
+      return this.statsCalculator.totalAnswers;
     },
     overtimeCorrectAnswersRate() {
-      return this.statsCalculator.overtimeCorrectAnswersRate();
+      return this.statsCalculator.overtimeCorrectAnswersRate;
     },
   }
 })

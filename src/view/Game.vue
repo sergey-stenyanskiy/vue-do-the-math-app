@@ -173,13 +173,13 @@ export default defineComponent({
   },
   computed: {
     correctAnswers() {
-      return this.statsCalculator.correctAnswers();
+      return this.statsCalculator.correctAnswers;
     },
     totalAnswers() {
-      return this.statsCalculator.totalAnswers();
+      return this.statsCalculator.totalAnswers;
     },
     correctAnswerRate() {
-      return this.statsCalculator.correctAnswerRate();
+      return this.statsCalculator.correctAnswerRate;
     },
     timeLeft(): Date {
       return new Date(this.endTime.getTime() - this.currentTime.getTime());
