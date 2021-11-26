@@ -52,20 +52,22 @@ export default class GameStatsCalculator {
     let lastSessionTime: Date | null = null;
     let result = 0;
 
+    if (this.stats.sessions.length === 0) {
+      return 0;
+    }
+
     for (let i = this.stats.sessions.length - 1; i >= 0; i--) {
       const session = this.stats.sessions[i];
 
-      if (!session) return 0;
-
-      if (session.end != null && lastSessionTime != null) {
-        if (lastSessionTime.getDay() - session.end.getDay() < 2) {
+      if (lastSessionTime != null) {
+        if (lastSessionTime.getDay() - session.start.getDay() < 2) {
           result++;
-
-          lastSessionTime = session.end;
         } else {
           return 0;
         }
       }
+
+      lastSessionTime = session.start;
     }
 
     return result;
