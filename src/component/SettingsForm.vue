@@ -33,7 +33,7 @@ import { defineComponent } from 'vue'
 
 import { GameSettings, Operator } from '../types/types'
 
-import defaultSettings from "../constant/index"
+import defaultSettings from '../constant/index'
 
 type State = GameSettings
 

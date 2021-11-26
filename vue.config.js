@@ -1,4 +1,4 @@
-const path = require("path");
+const path = require('path');
 
 module.exports = {
   publicPath: '/',
@@ -20,7 +20,7 @@ module.exports = {
       devtoolModuleFilenameTemplate: (info) => {
         const resPath = path.normalize(info.resourcePath);
         const isVue = resPath.match(/\.vue$/) || resPath.match(/\.ts$/);
-        const isSource = info.query === "?vue&type=script&lang=ts" || info.query === '';
+        const isSource = info.query === '?vue&type=script&lang=ts' || info.query === '';
 
         const generated = `webpack-generated:///${resPath}?${info.hash}`;
         const vuesource = `sources://${info.resourcePath}`;
@@ -32,7 +32,7 @@ module.exports = {
       rules: [
         {
           test: /\.pug$/i,
-          loader: "pug-plain-loader"
+          loader: 'pug-plain-loader'
         },
       ]
     }

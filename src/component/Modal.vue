@@ -31,7 +31,7 @@ export default defineComponent({
       default: true
     },
   },
-  emits: ['overlay-clicked', "fade-ended", "dialog-action"],
+  emits: ['overlay-clicked', 'fade-ended', 'dialog-action'],
   watch: {
     show(value: boolean) {
       if (value) {

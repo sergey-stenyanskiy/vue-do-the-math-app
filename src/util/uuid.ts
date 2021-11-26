@@ -1,4 +1,4 @@
-import { customAlphabet } from "nanoid";
+import { customAlphabet } from 'nanoid';
 
 const nanoid = customAlphabet('abcdefghiklmnopqrstuvxyz1234567890', 5);
 

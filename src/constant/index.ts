@@ -1,4 +1,4 @@
-import { DefaultSettings } from "../types/types"
+import { DefaultSettings } from '../types/types'
 
 const defaultSettings: DefaultSettings = {
   minDifficulty: 1,

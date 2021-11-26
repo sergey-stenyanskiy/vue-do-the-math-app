@@ -127,7 +127,7 @@ type ButtonAction = {
 }
 
 export default defineComponent({
-  name: "Game",
+  name: 'Game',
   components: {
     RoundButton,
     SvgIcon,
@@ -264,7 +264,7 @@ export default defineComponent({
         return null;
       }
 
-      let answerExpression = "";
+      let answerExpression = '';
 
       for (const term of this.questionExpressionTerms) {
         if (term.inputIndex != null) {
@@ -483,7 +483,7 @@ export default defineComponent({
     resetInputState() {
       if (this.question) {
         for (let i = 0; i < this.question.hideIndexes.length; i++) {
-          this.inputs[i] = { value: "" };
+          this.inputs[i] = { value: '' };
         }
       }
 
