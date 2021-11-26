@@ -18,7 +18,15 @@ const EMPTY_STATS = {
   sessions: []
 };
 
-const initialStats = JSON.parse(localStorage.getItem('stats') ?? 'null') ?? EMPTY_STATS;
+function dateReviver(name: string, value: any) {
+  if (name === 'start' || name === 'end') {
+    return new Date(Date.parse(value));
+  }
+
+  return value;
+}
+
+const initialStats = JSON.parse(localStorage.getItem('stats') ?? 'null', dateReviver) ?? EMPTY_STATS;
 
 const INITIAL_STATE: State = {
   previousRoute: '',
