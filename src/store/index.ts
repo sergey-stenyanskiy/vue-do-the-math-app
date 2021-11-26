@@ -31,7 +31,7 @@ type SetGameSessionPayload = {
   data: GameSessionData
 }
 
-type Getters = {
+type StoreGetters = {
   lastSession: GameSession | null
   currentSession: GameSession | null
   consecutiveDays: number
@@ -110,7 +110,7 @@ export default createStore({
     setGameSession({ commit }: {commit: Commit}, payload: SetGameSessionPayload) {
       commit('setGameSession', payload);
     },
-    endGameSession({ commit, getters }: { commit: Commit, getters: Getters }) {
+    endGameSession({ commit, getters }: { commit: Commit, getters: StoreGetters }) {
       commit('setGameSession', {
         id: getters.currentSession?.id,
         data: {
@@ -123,15 +123,15 @@ export default createStore({
     }
   },
   getters: {
-    lastSession(state: State, getters: Getters): GameSession | null {
+    lastSession(state: State, getters: StoreGetters): GameSession | null {
       return getters.sessionFromLast(0);
     },
-    sessionFromLast(state: State, getters: Getters): (number: number) => GameSessionData | null {
+    sessionFromLast(state: State): (number: number) => GameSessionData | null {
       return function getSessionFromLast(number: number): GameSessionData | null {
         return state.stats.sessions[state.stats.sessions.length - 1 - number] ?? null;
       }
     },
-    currentSession(state: State, getters: Getters): GameSession | null {
+    currentSession(state: State, getters: StoreGetters): GameSession | null {
       const last = getters.lastSession;
 
       return last && last.status === 'ongoing' ? last : null;
@@ -162,7 +162,7 @@ export default createStore({
 
       return result;
     },
-    consecutiveDays(state: State, getters: Getters): number {
+    consecutiveDays(state: State): number {
       let lastSessionTime: Date | null = null;
       let result = 0;
 
