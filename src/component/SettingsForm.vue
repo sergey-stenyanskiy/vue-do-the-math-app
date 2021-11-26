@@ -31,6 +31,29 @@ type OperatorOption = {
   label: string
 }
 
+const OPERATOR_OPTIONS: OperatorOption[] = [
+  {
+    operator: '+',
+    label: 'Сложение'
+  },
+  {
+    operator: '-',
+    label: 'Вычитание'
+  },
+  {
+    operator: '*',
+    label: 'Умножение'
+  },
+  {
+    operator: '/',
+    label: 'Деление'
+  },
+  {
+    operator: '**',
+    label: 'Возведение в степень'
+  },
+];
+
 export default defineComponent({
   name: 'SettingsForm',
   data(): State {
@@ -40,28 +63,7 @@ export default defineComponent({
   },
   computed: {
     operatorOptions(): OperatorOption[] {
-      return [
-        {
-          operator: '+',
-          label: 'Сложение'
-        },
-        {
-          operator: '-',
-          label: 'Вычитание'
-        },
-        {
-          operator: '*',
-          label: 'Умножение'
-        },
-        {
-          operator: '/',
-          label: 'Деление'
-        },
-        {
-          operator: '**',
-          label: 'Возведение в степень'
-        },
-      ]
+      return OPERATOR_OPTIONS;
     }
   },
   methods: {
