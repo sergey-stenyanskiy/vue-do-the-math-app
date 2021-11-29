@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 
 import Home from '../view/Home.vue'
+import Game from '../view/Game.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -8,6 +9,16 @@ const routes: Array<RouteRecordRaw> = [
     name: 'Home',
     component: Home
   },
+  {
+    path: '/game',
+    name: 'Game',
+    component: Game
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    redirect: '/'
+  }
 ]
 
 const router = createRouter({
