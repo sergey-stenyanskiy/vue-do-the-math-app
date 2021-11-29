@@ -1,18 +1,22 @@
 import { createStore, Commit } from 'vuex'
 
-import { State, GameSettingsData, GameStat } from '../types/types'
-
-import { GameSession, GameSessionData, OvertimeStats } from '../GameStatsCalculator/types'
-
 import uuid from '../util/uuid'
 
 import defaultSettings from '@/constant'
 
+import { State, GameSettingsData, GameStat } from '../types/types'
+
+import { GameSession, GameSessionData, OvertimeStats } from '../GameStatsCalculator/types'
+
+import WebLocalStorage from '@/WebLocalStorage'
+
+const webStorage = new WebLocalStorage();
+
 function dumpStats(stats: OvertimeStats) {
   if (!stats.sessions || stats.sessions.length === 0) {
-    localStorage.removeItem('stats');
+    webStorage.removeItem('stats');
   } else {
-    localStorage.setItem('stats', JSON.stringify(stats));
+    webStorage.setItem('stats', JSON.stringify(stats));
   }
 }
 
@@ -20,15 +24,7 @@ const EMPTY_STATS = {
   sessions: []
 };
 
-function dateReviver(name: string, value: any) {
-  if (name === 'start' || name === 'end') {
-    return new Date(Date.parse(value));
-  }
-
-  return value;
-}
-
-const initialStats = JSON.parse(localStorage.getItem('stats') ?? 'null', dateReviver) ?? EMPTY_STATS;
+const initialStats = webStorage.getItem('stats') ?? EMPTY_STATS;
 
 const INITIAL_STATE: State = {
   previousRoute: '',

@@ -70,3 +70,10 @@ export type ExpressionTerm = {
   type: ExpressionTermType
   inputIndex?: number
 }
+
+export interface Storage<T> {
+  clear(): void;
+  getItem(key: string): T | null;
+  removeItem(key: string): void;
+  setItem(key: string, value: string): void;
+}
