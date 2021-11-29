@@ -1,6 +1,8 @@
-import { createStore, Commit, Getter, GetterTree } from 'vuex'
+import { createStore, Commit } from 'vuex'
 
-import { State, GameSettingsData, GameStat, GameSession, GameSessionData, GameSessionRate, OvertimeStats } from '../types/types'
+import { State, GameSettingsData, GameStat } from '../types/types'
+
+import { GameSession, GameSessionData, OvertimeStats } from '../GameStatsCalculator/types'
 
 import uuid from '../util/uuid'
 

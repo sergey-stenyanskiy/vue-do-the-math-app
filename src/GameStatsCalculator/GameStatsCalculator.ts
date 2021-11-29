@@ -1,5 +1,5 @@
 
-import { GameSession, GameSessionRate, OvertimeStats } from '@/types/types';
+import { GameSession, GameSessionRate, OvertimeStats } from './types';
 
 export default class GameStatsCalculator {
   stats: OvertimeStats;
