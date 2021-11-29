@@ -7,6 +7,29 @@ export function getRandomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min)) + min;
 }
 
+type PluralizationOptions = {
+  one: string
+  few: string
+  many: string
+}
+
+export function pluralize(count: number, options: PluralizationOptions): string {
+  const lastTwoDigits = count % 100;
+
+  if (lastTwoDigits >= 11 && lastTwoDigits <= 19) {
+    return options.many;
+  }
+
+  const lastDigit = count % 10;
+
+  switch (lastDigit) {
+    case 0: case 5: case 6: case 7: case 8: case 9: return options.many;
+    case 1: return options.one;
+    case 2: case 3: case 4: return options.few;
+    default: return options.one
+  }
+}
+
 type GenerateQuestionConfig = {
   gameSettings: GameSettings
   minNumber?: number

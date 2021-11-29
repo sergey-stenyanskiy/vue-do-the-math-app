@@ -33,6 +33,8 @@ import { defineComponent } from 'vue'
 
 import { GameSettings, Operator } from '../types/types'
 
+import { pluralize } from '../util/util'
+
 import defaultSettings from '../constant/index'
 
 type State = GameSettings
@@ -78,24 +80,15 @@ export default defineComponent({
     },
     settings(): GameSettings {
       return this.$store.state.settings;
-    }
+    },
   },
   methods: {
-    minutesInflection(numMinutes: number): string {
-      const lastTwoDigits = numMinutes % 100;
-
-      if (lastTwoDigits >= 11 && lastTwoDigits <= 19) {
-        return 'минут';
-      }
-
-      const lastDigit = numMinutes % 10;
-
-      switch (lastDigit) {
-        case 0: case 5: case 6: case 7: case 8: case 9: return 'минут';
-        case 1: return 'минута';
-        case 2: case 3: case 4: return 'минуты';
-        default: return 'минут'
-      }
+    minutesInflection(count: number): string {
+      return pluralize(count, {
+        one: 'минута',
+        few: 'минуты',
+        many: 'минут',
+      });
     },
     handleSubmit() {
       this.$store.dispatch('setSettings', {
