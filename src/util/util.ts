@@ -30,91 +30,91 @@ export function pluralize(count: number, options: PluralizationOptions): string 
   }
 }
 
-type GenerateQuestionConfig = {
-  gameSettings: GameSettings
-  minNumber?: number
-  maxNumber?: number
-}
+// type GenerateQuestionConfig = {
+//   gameSettings: GameSettings
+//   minNumber?: number
+//   maxNumber?: number
+// }
 
-function generateQuestionNumbers(min: number, max: number, n: number): number[] {
-  const numbers: number[] = [];
+// function generateQuestionNumbers(min: number, max: number, n: number): number[] {
+//   const numbers: number[] = [];
 
-  for (let i = 0; i < n; i++) {
-    numbers.push(getRandomInt(min, max + 1));
-  }
+//   for (let i = 0; i < n; i++) {
+//     numbers.push(getRandomInt(min, max + 1));
+//   }
 
-  return numbers;
-}
+//   return numbers;
+// }
 
-function generateQuestionOperators(n: number, allowedOperators: Operator[]): Operator[] {
-  const operators: Operator[] = [];
+// function generateQuestionOperators(n: number, allowedOperators: Operator[]): Operator[] {
+//   const operators: Operator[] = [];
 
-  for (let i = 0; i < n; i++) {
-    const index = getRandomInt(0, allowedOperators.length);
+//   for (let i = 0; i < n; i++) {
+//     const index = getRandomInt(0, allowedOperators.length);
 
-    operators.push(allowedOperators[index]);
-  }
+//     operators.push(allowedOperators[index]);
+//   }
 
-  return operators;
-}
+//   return operators;
+// }
 
-function generateQuestionTerms(numbers: number[], operators: Operator[]): QuestionTerm[] {
-  return numbers.map((number, i) => ({ number, operator: operators[i] }));
-}
+// function generateQuestionTerms(numbers: number[], operators: Operator[]): QuestionTerm[] {
+//   return numbers.map((number, i) => ({ number, operator: operators[i] }));
+// }
 
-function generateQuestionHiddenNumbers(difficulty: number, termsNumber: number): number[] {
-  const indexesToChoose: number[] = (new Array(termsNumber)).fill(0).map((item, i) => i);
-  const hideIndexes: number[] = [];
+// function generateQuestionHiddenNumbers(difficulty: number, termsNumber: number): number[] {
+//   const indexesToChoose: number[] = (new Array(termsNumber)).fill(0).map((item, i) => i);
+//   const hideIndexes: number[] = [];
 
-  for (let i = 0; i < difficulty; i++) {
-    const index = getRandomInt(0, indexesToChoose.length);
+//   for (let i = 0; i < difficulty; i++) {
+//     const index = getRandomInt(0, indexesToChoose.length);
 
-    hideIndexes.push(indexesToChoose[index]);
-    indexesToChoose.splice(index, 1);
-  }
+//     hideIndexes.push(indexesToChoose[index]);
+//     indexesToChoose.splice(index, 1);
+//   }
 
-  return hideIndexes;
-}
+//   return hideIndexes;
+// }
 
-function buildQuestionExpression(terms: QuestionTerm[]): string {
-  let expression = '';
+// function buildQuestionExpression(terms: QuestionTerm[]): string {
+//   let expression = '';
 
-  for (let i = 0; i < terms.length; i++) {
-    expression += terms[i].number + (terms[i].operator ?? '');
-  }
+//   for (let i = 0; i < terms.length; i++) {
+//     expression += terms[i].number + (terms[i].operator ?? '');
+//   }
 
-  return expression;
-}
+//   return expression;
+// }
 
-export function generateQuestion({
-  gameSettings,
-  minNumber = 1,
-  maxNumber = 10
-}: GenerateQuestionConfig): Question {
-  const numNumbers = gameSettings.difficulty + 1;
+// export function generateQuestion({
+//   gameSettings,
+//   minNumber = 1,
+//   maxNumber = 10
+// }: GenerateQuestionConfig): Question {
+//   const numNumbers = gameSettings.difficulty + 1;
 
-  const numbers = generateQuestionNumbers(minNumber, maxNumber, numNumbers);
+//   const numbers = generateQuestionNumbers(minNumber, maxNumber, numNumbers);
 
-  const numOperators = numNumbers - 1;
+//   const numOperators = numNumbers - 1;
 
-  const operators = generateQuestionOperators(numOperators, gameSettings.operators);
+//   const operators = generateQuestionOperators(numOperators, gameSettings.operators);
 
-  const terms = generateQuestionTerms(numbers, operators);
+//   const terms = generateQuestionTerms(numbers, operators);
 
-  const hideIndexes = generateQuestionHiddenNumbers(gameSettings.difficulty, numNumbers);
+//   const hideIndexes = generateQuestionHiddenNumbers(gameSettings.difficulty, numNumbers);
 
-  const expression = buildQuestionExpression(terms);
+//   const expression = buildQuestionExpression(terms);
 
-  // eslint-disable-next-line no-new-func
-  const answer = (new Function(`return ${expression};`))();
+//   // eslint-disable-next-line no-new-func
+//   const answer = (new Function(`return ${expression};`))();
 
-  return {
-    numbers,
-    operators,
-    terms,
-    hideIndexes,
-    expression,
-    answer,
-    settings: { ...gameSettings }
-  }
-}
+//   return {
+//     numbers,
+//     operators,
+//     terms,
+//     hideIndexes,
+//     expression,
+//     answer,
+//     settings: { ...gameSettings }
+//   }
+// }

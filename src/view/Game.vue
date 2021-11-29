@@ -95,9 +95,8 @@ import { defineComponent } from 'vue'
 
 import { GameSettings, Question, UserAnswer, GameStats, ExpressionTerm } from '../types/types'
 
-import { generateQuestion } from '../util/util'
-
 import gameStatsMixin from '../mixin/statsCalculatorMixin'
+import questionGeneratorMixin from '../mixin/questionGeneratorMixin'
 
 import SvgIcon from '../component/SvgIcon.vue'
 import AlertMessage from '../component/AlertMessage.vue'
@@ -140,7 +139,7 @@ export default defineComponent({
     AlertMessage,
     Modal
   },
-  mixins: [gameStatsMixin],
+  mixins: [gameStatsMixin, questionGeneratorMixin],
   beforeRouteLeave(
     from,
     to,
@@ -507,7 +506,7 @@ export default defineComponent({
       this.focusUserInput(0);
     },
     generateNextQuestion(): Question {
-      return generateQuestion({
+      return this.questionGenerator.generateQuestion({
         gameSettings: this.settings
       });
     },
